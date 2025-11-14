@@ -19,12 +19,12 @@ import { Separator } from "../ui/separator";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 import Link from "next/link";
 const loginformvalues = z.object({
-  email: z.email("Please enter a correct maill address"),
+  email: z.email("Please enter a correct mail address"),
   password: z
     .string()
     .min(1, "Password is required")
     .regex(
-      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
       "Password must have at least one lowercase letter, one uppercase letter, one number, and one special character."
     ),
 });
@@ -85,7 +85,7 @@ export default function LoginForm() {
           <Button
             type="submit"
             disabled={isPending}
-            className="w-full bg-primary group/btn disabled:blue-sm  cursor-pointer text-white"
+            className="w-full bg-primary group/btn disabled:opacity-50 cursor-pointer text-white"
           >
             Login
             <BottomGradient />
@@ -104,7 +104,7 @@ export default function LoginForm() {
             <IconBrandGithub /> Continue With Github
             <BottomGradient />
           </Button>
-          <Button className="w-full group/btn cursor-pointer bg-primary text-white">
+          <Button disabled={isPending} className="w-full group/btn cursor-pointer bg-primary text-white">
             <IconBrandGoogle /> Continue With Google
             <BottomGradient />
           </Button>

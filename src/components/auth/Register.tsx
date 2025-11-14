@@ -46,7 +46,7 @@ const signupformValues = z
   });
 type SignupFormValues = z.infer<typeof signupformValues>;
 export default function RegisterForm() {
-    const router = useRouter();
+  const router = useRouter();
   const signupFormInputs = {
     name: {
       required: "please enter your email",
@@ -82,23 +82,49 @@ export default function RegisterForm() {
     resolver: zodResolver(signupformValues),
   });
   const onSubmit = async (data: SignupFormValues) => {
-    toast.loading("Creating Account");
-    await authClient.signUp.email({
-      email: data.email,
-      password: data.password,
-      name: data.name,
-      callbackURL:"/"
-    },{
-        onSuccess:()=>{
+    const toastId = toast.loading("Creating Account");
+    try {
+      await authClient.signUp.email(
+        {
+          email: data.email,
+          password: data.password,
+          name: data.name,
+          callbackURL: "/",
+        },
+        {
+          onSuccess: () => {
+            toast.dismiss(toastId);
             toast.success("Account created successfully");
             router.push("/");
-        },
-        onError:(err)=>{
-            console.log(err);
-            
-            toast.warning("Something went wrong")
+          },
+          onError: (err: unknown) => {
+            toast.dismiss(toastId);
+            console.error("Registration error:", err);
+            let errorMessage = "Something went wrong";
+            if (err instanceof Error) {
+              errorMessage = (err as Error).message;
+            } else if (err && typeof err === "object" && "message" in err) {
+              errorMessage = String((err as any).message) || errorMessage;
+            } else if (err) {
+              errorMessage = String(err);
+            }
+            toast.error(errorMessage);
+          },
         }
-    });
+      );
+    } catch (err) {
+      toast.dismiss(toastId);
+      console.error("Registration error:", err);
+      let errorMessage = "Something went wrong";
+      if (err instanceof Error) {
+        errorMessage = (err as Error).message;
+      } else if (err && typeof err === "object" && "message" in err) {
+        errorMessage = String((err as any).message) || errorMessage;
+      } else if (err) {
+        errorMessage = String(err);
+      }
+      toast.error(errorMessage);
+    }
   };
   const isPending = form.formState.isSubmitting;
   return (

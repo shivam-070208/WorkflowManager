@@ -14,8 +14,20 @@ export const unauthRequire = async () => {
     });
     if (session) {
       // redirect back to the route the user originally tried to access, or to "/" as a fallback
-      const referer = (await headers()).get("referer") || "/";
-      redirect(referer);
-    }
-  };
+      const refererHeader = (await headers()).get("referer");
+      let redirectPath = "/";
+      
+      if (refererHeader) {
+        try {
+          const refererUrl = new URL(refererHeader);
+          // Only use pathname if it's from the same origin, otherwise fallback to "/"
+          redirectPath = refererUrl.pathname;
+        } catch {
+          // Invalid URL, use fallback
+          redirectPath = "/";
+        }
+      }
+      
+      redirect(redirectPath);
+    }  };
   
