@@ -1,0 +1,139 @@
+"use client";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarFooter,
+  SidebarSeparator,
+  SidebarMenuButton,
+  SidebarGroupContent,
+  SidebarHeader,
+} from "../ui/sidebar";
+import { Button } from "../ui/button";
+import {
+  HomeIcon,
+  UserIcon,
+  SettingsIcon,
+  LogOutIcon,
+  WorkflowIcon,
+  HistoryIcon,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname,useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
+import { IconStar } from "@tabler/icons-react";
+
+
+export default function AppSidebar() {
+  const pathName = usePathname();
+  const router = useRouter();
+  const MenuItems = [
+    {
+      tittle: "main",
+      items: [
+        {
+          tittle: "workflows",
+          icon: WorkflowIcon,
+          href: "/workflows",
+        },
+        {tittle:"execution",
+            icon: HistoryIcon,
+            href:"/execution"
+        }
+
+      ],
+    },
+  ];
+  const handleLogout = ()=>{
+    let toastId =toast.loading("Logging out...");
+    authClient.signOut({
+        fetchOptions:{
+            onSuccess:()=>{
+                toast.dismiss(toastId);
+                toastId=toast.message("Logged Out Redirecting");
+                router.push("/");
+                toast.dismiss(toastId);
+                toast.success("Logged Out");
+            },
+            onError:()=>{
+                toast.error("Something went wrong");
+            }
+        }
+    })
+  }
+  return (
+    <Sidebar className="overflow-x-hidden" variant="sidebar" side="left">
+      <SidebarHeader>
+        <SidebarMenuItem >
+          <SidebarMenuButton asChild className="hover:bg-sidebar ">
+            <Link href={"/"} prefetch className=" text-xl">
+              Home
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarHeader>
+    
+      <SidebarContent className="overflow-x-hidden">
+        {MenuItems.map((group, idx) => (
+          <SidebarGroup key={group.tittle || idx}>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item, itemIdx) => (
+                  <SidebarMenuItem key={item.tittle || itemIdx}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={
+                        item.href == "/"
+                          ? pathName == "/"
+                          : pathName.startsWith(item.href)
+                      }
+                    >
+                      <Link
+                      prefetch
+                        className={
+                          item.tittle === "workflows"
+                            ? "text-sidebar-foreground"
+                            : undefined
+                        }
+                        href={item.href || "#"}
+                      >
+                        {item.icon && (
+                          <item.icon size={16} style={{ marginRight: 8 }} />
+                        )}
+                        {item.tittle
+                          ? item.tittle.charAt(0).toUpperCase() +
+                            item.tittle.slice(1)
+                          : ""}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+        <SidebarSeparator />
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarSeparator />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link href="/subscribe" prefetch>
+                <IconStar /> Go to Pro
+              </Link>
+            </SidebarMenuButton>
+            <SidebarMenuButton asChild>
+              <div className="cursor-pointer" onClick={handleLogout}>
+                <LogOutIcon /> Logout
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
