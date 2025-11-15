@@ -1,10 +1,12 @@
 import { z } from "zod";
 import { baseProcedure,createTRPCRouter } from "../init";
 import { prisma } from "@/lib/db";
+import { inngest } from "@/inngest/client";
 
 export const appRouter = createTRPCRouter({
-    getUsers:baseProcedure.query( ()=>{
-       return prisma.user.findMany();
+   
+    inVokeIngest:baseProcedure.query(async()=>{
+       
     })
 })
 

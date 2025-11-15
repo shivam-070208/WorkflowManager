@@ -17,7 +17,9 @@ import { BottomGradient } from "../ui/bottom-gradient";
 import { Error } from "../ui/error";
 import { Separator } from "../ui/separator";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
+import {toast} from "sonner"
 import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
 const loginformvalues = z.object({
   email: z.email("Please enter a correct mail address"),
   password: z
@@ -51,9 +53,33 @@ export default function LoginForm() {
     },
     resolver: zodResolver(loginformvalues),
   });
-  const onSubmit = (data: LoginFormValues) => {
-    console.log(data);
-  };
+  const onSubmit =async (data: LoginFormValues) => {
+   const toastId = toast.loading("Logging in");
+  await authClient.signIn.email(
+    {
+      email: data.email,
+      password: data.password,
+      callbackURL:"/",
+
+  },{
+    onSuccess:()=>{
+      toast.dismiss(toastId);
+      toast.success("Logged in successfully redirecting");
+    },
+    onError:(err:unknown)=>{
+      toast.dismiss(toastId);
+      let errorMessage = "Something went wrong";
+      if (err instanceof Error) {
+        errorMessage = (err as Error).message;
+      } else if (err && typeof err === "object" && "message" in err) {
+        errorMessage = String((err as any).message) || errorMessage;
+      } else if (err) {
+        errorMessage = String(err);
+      }
+      toast.error(errorMessage);
+    }
+  });
+};
   const isPending = form.formState.isSubmitting;
   return (
     <Card className="w-full max-w-md mx-auto">
