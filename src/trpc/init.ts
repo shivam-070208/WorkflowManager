@@ -1,4 +1,5 @@
 import { auth } from '@/lib/auth';
+import { polarClient } from '@/lib/polar';
 import {initTRPC, TRPCError} from '@trpc/server';
 import { headers } from 'next/headers';
 import { cache } from 'react'; // cache is a React function that helps to create memoized async functions for server components
@@ -21,3 +22,13 @@ export const ProtectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
     }
     return next({ctx:{...ctx,auth:session}});
 });
+
+export const PremiumProcedure = ProtectedProcedure.use(async ({ctx,next})=>{
+    const state = await polarClient.customers.getStateExternal({
+        externalId: ctx.auth.user.id,
+    });
+    if (!state.activeSubscriptions?.length) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Premium subscription required" });
+    }
+    return next({ctx:{...ctx,state:state}});
+})
