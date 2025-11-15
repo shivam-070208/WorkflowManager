@@ -21,53 +21,48 @@ import {
   HistoryIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname,useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { IconStar } from "@tabler/icons-react";
-
 
 export default function AppSidebar() {
   const pathName = usePathname();
   const router = useRouter();
   const MenuItems = [
     {
-      tittle: "main",
+      title: "main",
       items: [
         {
-          tittle: "workflows",
+          title: "workflows",
           icon: WorkflowIcon,
           href: "/workflows",
         },
-        {tittle:"execution",
-            icon: HistoryIcon,
-            href:"/execution"
-        }
-
+        { title: "execution", icon: HistoryIcon, href: "/execution" },
       ],
     },
   ];
-  const handleLogout = ()=>{
-    let toastId =toast.loading("Logging out...");
+  const handleLogout = () => {
+    let toastId = toast.loading("Logging out...");
     authClient.signOut({
-        fetchOptions:{
-            onSuccess:()=>{
-                toast.dismiss(toastId);
-                toastId=toast.message("Logged Out Redirecting");
-                router.push("/");
-                toast.dismiss(toastId);
-                toast.success("Logged Out");
-            },
-            onError:()=>{
-                toast.error("Something went wrong");
-            }
-        }
-    })
-  }
+      fetchOptions: {
+        onSuccess: () => {
+          toast.dismiss(toastId);
+          toastId = toast.message("Logged Out Redirecting");
+          router.push("/");
+          toast.dismiss(toastId);
+          toast.success("Logged Out");
+        },
+        onError: () => {
+          toast.error("Something went wrong");
+        },
+      },
+    });
+  };
   return (
     <Sidebar className="overflow-x-hidden" variant="sidebar" side="left">
       <SidebarHeader>
-        <SidebarMenuItem >
+        <SidebarMenuItem>
           <SidebarMenuButton asChild className="hover:bg-sidebar ">
             <Link href={"/"} prefetch className=" text-xl">
               Home
@@ -75,26 +70,26 @@ export default function AppSidebar() {
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarHeader>
-    
+
       <SidebarContent className="overflow-x-hidden">
         {MenuItems.map((group, idx) => (
-          <SidebarGroup key={group.tittle || idx}>
+          <SidebarGroup key={group.title || idx}>
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item, itemIdx) => (
-                  <SidebarMenuItem key={item.tittle || itemIdx}>
+                  <SidebarMenuItem key={item.title || itemIdx}>
                     <SidebarMenuButton
                       asChild
                       isActive={
-                        item.href == "/"
-                          ? pathName == "/"
+                        item.href === "/"
+                          ? pathName === "/"
                           : pathName.startsWith(item.href)
                       }
                     >
                       <Link
-                      prefetch
+                        prefetch
                         className={
-                          item.tittle === "workflows"
+                          item.title === "workflows"
                             ? "text-sidebar-foreground"
                             : undefined
                         }
@@ -103,9 +98,9 @@ export default function AppSidebar() {
                         {item.icon && (
                           <item.icon size={16} style={{ marginRight: 8 }} />
                         )}
-                        {item.tittle
-                          ? item.tittle.charAt(0).toUpperCase() +
-                            item.tittle.slice(1)
+                        {item.title
+                          ? item.title.charAt(0).toUpperCase() +
+                            item.title.slice(1)
                           : ""}
                       </Link>
                     </SidebarMenuButton>
