@@ -25,10 +25,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { IconStar } from "@tabler/icons-react";
+import { useListActivationSubscription } from "@/hooks/use-subscription";
 
 export default function AppSidebar() {
   const pathName = usePathname();
   const router = useRouter();
+  const {isActive,isLoading} = useListActivationSubscription();
   const MenuItems = [
     {
       title: "main",
@@ -59,6 +61,21 @@ export default function AppSidebar() {
       },
     });
   };
+  const handleSubscribe = ()=>{
+    authClient.checkout({
+        slug: "Worflow-developement",
+        fetchOptions:{
+            onSuccess:()=>{
+                toast.success("you are subscribed with us");
+            },
+            onError:(err)=>{
+                toast.error("Failed to start checkout");
+                console.error(err);
+            }
+        }
+    })
+}
+
   return (
     <Sidebar className="overflow-x-hidden" variant="sidebar" side="left">
       <SidebarHeader>
@@ -116,11 +133,11 @@ export default function AppSidebar() {
         <SidebarSeparator />
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link href="/subscribe" prefetch>
+           {!isLoading && !isActive&& <SidebarMenuButton asChild>
+              <button onClick={handleSubscribe}  >
                 <IconStar /> Go to Pro
-              </Link>
-            </SidebarMenuButton>
+              </button>
+            </SidebarMenuButton>}
             <SidebarMenuButton asChild>
               <div className="cursor-pointer" onClick={handleLogout}>
                 <LogOutIcon /> Logout
