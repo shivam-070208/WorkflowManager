@@ -13,9 +13,6 @@ import {
 } from "../ui/sidebar";
 import { Button } from "../ui/button";
 import {
-  HomeIcon,
-  UserIcon,
-  SettingsIcon,
   LogOutIcon,
   WorkflowIcon,
   HistoryIcon,
@@ -26,6 +23,7 @@ import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { IconStar } from "@tabler/icons-react";
 import { useListActivationSubscription } from "@/hooks/use-subscription";
+import Image from "next/image";
 
 export default function AppSidebar() {
   const pathName = usePathname();
@@ -57,8 +55,8 @@ export default function AppSidebar() {
         },
         onError: () => {
           toast.error("Something went wrong");
-        },
-      },
+        }
+      }
     });
   };
   const handleSubscribe = ()=>{
@@ -66,27 +64,29 @@ export default function AppSidebar() {
         slug: "Worflow-developement",
         fetchOptions:{
             onSuccess:()=>{
-                toast.success("you are subscribed with us");
+                toast.success("Select plan and subscribe");
             },
             onError:(err)=>{
                 toast.error("Failed to start checkout");
                 console.error(err);
             }
         }
-    })
-}
-
-  return (
-    <Sidebar className="overflow-x-hidden" variant="sidebar" side="left">
+      })
+    }
+    
+    return (
+      <Sidebar className="overflow-x-hidden" variant="sidebar" side="left">
       <SidebarHeader>
         <SidebarMenuItem>
           <SidebarMenuButton asChild className="hover:bg-sidebar ">
-            <Link href={"/"} prefetch className=" text-xl">
+            <Link href={"/"} prefetch className="flex gap-1 text-xl">
+            <Image src={"/logo.png"} width={50} height={50} alt={"logo"}/>
               Home
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarHeader>
+      <SidebarSeparator />
 
       <SidebarContent className="overflow-x-hidden">
         {MenuItems.map((group, idx) => (
@@ -105,11 +105,7 @@ export default function AppSidebar() {
                     >
                       <Link
                         prefetch
-                        className={
-                          item.title === "workflows"
-                            ? "text-sidebar-foreground"
-                            : undefined
-                        }
+                        className={"p-4 py-5"}
                         href={item.href || "#"}
                       >
                         {item.icon && (
@@ -127,14 +123,14 @@ export default function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
         ))}
-        <SidebarSeparator />
+
       </SidebarContent>
-      <SidebarFooter>
         <SidebarSeparator />
+      <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
            {!isLoading && !isActive&& <SidebarMenuButton asChild>
-              <button onClick={handleSubscribe}  >
+              <button className="cursor-pointer" onClick={handleSubscribe}  >
                 <IconStar /> Go to Pro
               </button>
             </SidebarMenuButton>}

@@ -6,6 +6,7 @@ export const useSubscription = () => {
     queryKey: ["membership"],
     queryFn: async () => {
       const { data } = await authClient.customer.state();
+      
       return data;
     },
   });
@@ -13,6 +14,7 @@ export const useSubscription = () => {
 
 export const useListActivationSubscription = () => {
   const { data: customerState, isLoading, ...rest } = useSubscription();
+
   if (
     customerState?.activeSubscriptions &&
     customerState?.activeSubscriptions.length > 0

@@ -1,10 +1,10 @@
-import LoginForm from '@/components/auth/Login'
+import LoginForm from '@/services/auth/components/Login'
 import { unauthRequire } from '@/lib/auth-utils';
-
 import React from 'react'
 
+
 async function page() {
-  await unauthRequire();
+  // await unauthRequire();
 
   return (  
     <div className='grid place-items-center min-h-dvh p-3'>
