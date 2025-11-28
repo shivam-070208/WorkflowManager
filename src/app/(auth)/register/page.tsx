@@ -1,4 +1,4 @@
-import RegisterForm from "@/components/auth/Register";
+import RegisterForm from "@/services/auth/components/Register";
 import { unauthRequire } from '@/lib/auth-utils';
 import React from "react";
 

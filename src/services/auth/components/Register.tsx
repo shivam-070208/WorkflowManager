@@ -7,20 +7,21 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../ui/card";
+} from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input, Label, LabelInputContainer } from "../ui/input";
-import { Button } from "../ui/button";
-import { BottomGradient } from "../ui/bottom-gradient";
-import { Error } from "../ui/error";
-import { Separator } from "../ui/separator";
+import { Input, Label, LabelInputContainer } from "../../../components/ui/input";
+import { Button } from "@/components/ui/button";
+import { BottomGradient } from "@/components/ui/bottom-gradient";
+import { Error } from "@/components/ui/error";
+import { Separator } from "@/components/ui/separator";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Image from "next/image";
 const signupformValues = z
   .object({
     name: z.string().min(1, "Name is required"),
@@ -129,7 +130,8 @@ export default function RegisterForm() {
   const isPending = form.formState.isSubmitting;
   return (
     <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
+      <CardHeader className = "text-center">
+      <Image src="/logo.png" height={80} width={140} alt="logo" className="mx-auto"  />
         <CardTitle>Get Started</CardTitle>
         <CardDescription>Create your account to continue</CardDescription>
       </CardHeader>
@@ -176,12 +178,12 @@ export default function RegisterForm() {
         <CardFooter className="px-0 gap-4">
           <Button
             disabled={isPending}
-            className="w-full group/btn cursor-pointer"
+            className="w-full group/btn cursor-pointer flex"
           >
             <IconBrandGithub /> Continue With Github
             <BottomGradient />
           </Button>
-          <Button className="w-full group/btn cursor-pointer bg-primary text-white">
+          <Button className="w-full group/btn cursor-pointer bg-primary flex text-white">
             <IconBrandGoogle /> Continue With Google
             <BottomGradient />
           </Button>
