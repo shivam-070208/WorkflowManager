@@ -1,10 +1,11 @@
-import { WorkflowContainer } from "@/services/workflows/components/Workflows";
+import { WorkflowContainer,WorkflowList } from "@/services/workflows/components/Workflows";
 import { HydrateClient } from "@/trpc/server";
 import React, { Suspense } from "react";
 import { prefetchWorkflows } from "@/services/workflows/server/prefetch";
 function page() {
   prefetchWorkflows({page:1,limit:10});
   return (
+      <WorkflowContainer >
     <HydrateClient>
       <Suspense
         fallback={
@@ -13,9 +14,10 @@ function page() {
           </div>
         }
       >
-        <WorkflowContainer />
+        <WorkflowList />
       </Suspense>
     </HydrateClient>
+    </WorkflowContainer>
   );
 }
 

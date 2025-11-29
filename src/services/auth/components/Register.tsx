@@ -11,7 +11,11 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input, Label, LabelInputContainer } from "../../../components/ui/input";
+import {
+  Input,
+  Label,
+  LabelInputContainer,
+} from "../../../components/ui/input";
 import { Button } from "@/components/ui/button";
 import { BottomGradient } from "@/components/ui/bottom-gradient";
 import { Error } from "@/components/ui/error";
@@ -22,6 +26,7 @@ import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
+import { ErrorContext } from "better-auth/client";
 const signupformValues = z
   .object({
     name: z.string().min(1, "Name is required"),
@@ -31,14 +36,14 @@ const signupformValues = z
       .min(1, "Password is required")
       .regex(
         /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-        "Password must have at least one lowercase letter, one uppercase letter, one number, and one special character."
+        "Password must have at least one lowercase letter, one uppercase letter, one number, and one special character.",
       ),
     confirmPassword: z
       .string()
       .min(1, "Confirm Password is required")
       .regex(
         /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-        "Password must have at least one lowercase letter, one uppercase letter, one number, and one special character."
+        "Password must have at least one lowercase letter, one uppercase letter, one number, and one special character.",
       ),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -82,6 +87,48 @@ export default function RegisterForm() {
     },
     resolver: zodResolver(signupformValues),
   });
+  const handleGithubAuth = async (mode: "login" | "signup") => {
+    const toastId = toast.loading(mode === "signup" ? "Signing up with Github" : "Logging in with Github");
+    try {
+      await authClient.signIn.social(
+        {
+          provider:"github",
+          callbackURL:"/workflows",
+          fetchOptions:{
+            onResponse:()=>{
+              toast.dismiss(toastId);
+              toast.success("Logged in successfully redirecting");
+              
+            }
+          }
+        }
+      );
+    } catch (err) {
+      toast.dismiss(toastId);
+      toast.error("Authentication failed.");
+    }
+  };
+  const handleGoogleAuth = async (mode: "login" | "signup") => {
+    const toastId = toast.loading(mode === "signup" ? "Signing up with Github" : "Logging in with google");
+    try {
+      await authClient.signIn.social(
+        {
+          provider:"google",
+          callbackURL:"/workflows",
+          fetchOptions:{
+            onResponse:()=>{
+              toast.dismiss(toastId);
+              toast.success("Logged in successfully redirecting");
+              
+            }
+          }
+        }
+      );
+    } catch (err) {
+      toast.dismiss(toastId);
+      toast.error("Authentication failed.");
+    }
+  };
   const onSubmit = async (data: SignupFormValues) => {
     const toastId = toast.loading("Creating Account");
     try {
@@ -98,20 +145,14 @@ export default function RegisterForm() {
             toast.success("Account created successfully");
             router.push("/");
           },
-          onError: (err: unknown) => {
+          onError: (err: ErrorContext) => {
             toast.dismiss(toastId);
-            console.error("Registration error:", err);
-            let errorMessage = "Something went wrong";
-            if (err instanceof Error) {
-              errorMessage = (err as Error).message;
-            } else if (err && typeof err === "object" && "message" in err) {
-              errorMessage = String((err as any).message) || errorMessage;
-            } else if (err) {
-              errorMessage = String(err);
-            }
+         
+            // Try to get a meaningful error message
+            let errorMessage =err.error.message||"something went wrong";
             toast.error(errorMessage);
           },
-        }
+        },
       );
     } catch (err) {
       toast.dismiss(toastId);
@@ -130,8 +171,14 @@ export default function RegisterForm() {
   const isPending = form.formState.isSubmitting;
   return (
     <Card className="w-full max-w-md mx-auto">
-      <CardHeader className = "text-center">
-      <Image src="/logo.png" height={80} width={140} alt="logo" className="mx-auto"  />
+      <CardHeader className="text-center">
+        <Image
+          src="/logo.png"
+          height={80}
+          width={140}
+          alt="logo"
+          className="mx-auto"
+        />
         <CardTitle>Get Started</CardTitle>
         <CardDescription>Create your account to continue</CardDescription>
       </CardHeader>
@@ -176,14 +223,22 @@ export default function RegisterForm() {
         </form>
         <Separator />
         <CardFooter className="px-0 gap-4">
+        <Button
+              disabled={isPending}
+              className="w-full group/btn bg-secondary text-secondary-foreground cursor-pointer flex"
+              onClick={() => handleGithubAuth("login")}
+              type="button"
+            >
+              <IconBrandGithub /> Signup With Github
+              <BottomGradient />
+            </Button>
+
           <Button
             disabled={isPending}
-            className="w-full group/btn cursor-pointer flex"
+            onClick={()=>handleGoogleAuth("login")}
+            className="w-full group/btn cursor-pointer bg-primary text-white flex"
+
           >
-            <IconBrandGithub /> Continue With Github
-            <BottomGradient />
-          </Button>
-          <Button className="w-full group/btn cursor-pointer bg-primary flex text-white">
             <IconBrandGoogle /> Continue With Google
             <BottomGradient />
           </Button>
