@@ -39,7 +39,7 @@ export const workflowRouter = createTRPCRouter({
   getAll: ProtectedProcedure.input(
     z.object({
       page: z.number().min(1).default(1),
-      limit: z.number().min(1).max(100).default(10),
+      limit: z.number().min(1).max(100).default(12),
     }),
   ).query(async ({ ctx, input }) => {
     const skip = (input.page - 1) * input.limit;

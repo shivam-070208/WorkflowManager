@@ -21,6 +21,8 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
+import { BetterAuthError } from "better-auth";
+import { ErrorContext } from "better-auth/client";
 
 const loginformvalues = z.object({
   email: z.string().email("Please enter a correct mail address"),
@@ -70,16 +72,11 @@ export default function LoginForm() {
           toast.dismiss(toastId);
           toast.success("Logged in successfully redirecting");
         },
-        onError: (err: unknown) => {
+        onError: (err: ErrorContext) => {
           toast.dismiss(toastId);
-          let errorMessage = "Something went wrong";
-          if (err instanceof Error) {
-            errorMessage = (err as Error).message;
-          } else if (err && typeof err === "object" && "message" in err) {
-            errorMessage = String((err as any).message) || errorMessage;
-          } else if (err) {
-            errorMessage = String(err);
-          }
+       
+          // Try to get a meaningful error message
+          let errorMessage =err.error.message||"something went wrong";
           toast.error(errorMessage);
         },
       }
@@ -94,10 +91,10 @@ export default function LoginForm() {
           provider:"github",
           callbackURL:"/workflows",
           fetchOptions:{
-            onSuccess:()=>{
+           
+            onResponse:()=>{
               toast.dismiss(toastId);
               toast.success("Logged in successfully redirecting");
-              
             }
           }
         }
@@ -108,7 +105,7 @@ export default function LoginForm() {
     }
   };
   const handleGoogleAuth = async (mode: "login" | "signup") => {
-    const toastId = toast.loading(mode === "signup" ? "Signing up with Github" : "Logging in with Github");
+    const toastId = toast.loading(mode === "signup" ? "Signing up with Github" : "Logging in with google");
     try {
       await authClient.signIn.social(
         {
@@ -119,6 +116,12 @@ export default function LoginForm() {
               toast.dismiss(toastId);
               toast.success("Logged in successfully redirecting");
               
+            }, onError: (err: ErrorContext) => {
+              toast.dismiss(toastId);
+           
+              // Try to get a meaningful error message
+              let errorMessage =err.error.message||"something went wrong";
+              toast.error(errorMessage);
             }
           }
         }
@@ -178,7 +181,7 @@ export default function LoginForm() {
      
             <Button
               disabled={isPending}
-              className="w-full group/btn  cursor-pointer flex"
+              className="w-full group/btn bg-secondary text-secondary-foreground cursor-pointer flex"
               onClick={() => handleGithubAuth("login")}
               type="button"
             >

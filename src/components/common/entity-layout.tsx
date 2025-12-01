@@ -1,11 +1,13 @@
-"use client"
+"use client";
 import { cn } from "@/lib/utils";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
-
+import {motion} from "motion/react"
 import React from "react";
 import { Button } from "../ui/button";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Input } from "../ui/input";
 
 export const EntityWrapper = ({
   children,
@@ -14,7 +16,9 @@ export const EntityWrapper = ({
   children: React.ReactNode;
   className?: string;
 }) => (
-  <div className={cn("flex-1 flex flex-col gap-6 p-6 sm:p-10", className)}>{children}</div>
+  <div className={cn("flex-1 flex flex-col gap-6 p-6 sm:p-10", className)}>
+    {children}
+  </div>
 );
 
 type EntityHeaderProps =
@@ -23,11 +27,13 @@ type EntityHeaderProps =
       className?: string;
       actionLabel?: string;
       action: () => void;
+      isPending?:boolean;
       actionHref?: never;
     }
-  | {
+    | {
       children: React.ReactNode;
       className?: string;
+      isPending?:never;
       actionLabel?: string;
       action?: never;
       actionHref: string;
@@ -38,12 +44,13 @@ export const EntityHeader = ({
   className = "",
   actionLabel,
   action,
-  actionHref
+  isPending,
+  actionHref,
 }: EntityHeaderProps) => (
   <div
     className={cn(
       "flex flex-col gap-3  sm:flex-row sm:items-center sm:justify-between",
-      className
+      className,
     )}
   >
     <div>{children}</div>
@@ -53,16 +60,25 @@ export const EntityHeader = ({
       </Link>
     )}
     {!!actionLabel && action && (
-      <Button onClick={action} variant={"outline"} className="flex bg-primary text-primary-foreground font-medium hover:opacity-80">
-      <PlusIcon className="inline" />  {actionLabel}
+      <Button
+        onClick={action}
+        variant={"outline"}
+        disabled={isPending}
+        className="flex font-medium hover:opacity-80"
+      >
+        <PlusIcon className="inline" /> {actionLabel}
       </Button>
     )}
   </div>
 );
 
-export const EntityContent = ({children,className = ""}:{children:React.ReactNode,className?:string})=>(
-    <div className={cn("flex-1",className)}>{children}</div>
-)
+export const EntityContent = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => <div className={cn("flex-1", className)}>{children}</div>;
 export const EntityHeaderContent = ({
   heading,
   subheading,
@@ -105,12 +121,11 @@ export function EntityTable<T extends { [key: string]: any }>({
   data,
   columns,
   searchPlaceholder,
-  filterComponent,
   sortOptions,
   className = "",
   pagination,
 }: EntityTableProps<T>) {
-  const [sortKey, setSortKey] = React.useState(sortOptions?.[0]?.value || "");
+  const [sortKey, setSortKey] = React.useState("");
   const [sortedData, setSortedData] = React.useState(data);
 
   React.useEffect(() => {
@@ -119,8 +134,14 @@ export function EntityTable<T extends { [key: string]: any }>({
       const col = columns.find((c) => c.id === sortKey);
       if (col) {
         filtered = [...filtered].sort((a, b) => {
-          const aValue = col.accessor(a);
-          const bValue = col.accessor(b);
+          let aValue = col.accessor(a);
+          let bValue = col.accessor(b);
+          if(typeof aValue == "object"){
+            aValue = a[sortKey];
+          }
+          if(typeof bValue == "object"){
+            bValue = b[sortKey]
+          }          
           if (typeof aValue === "string" && typeof bValue === "string") {
             return aValue.localeCompare(bValue);
           }
@@ -133,66 +154,84 @@ export function EntityTable<T extends { [key: string]: any }>({
     }
     setSortedData(filtered);
   }, [sortKey, data, columns]);
+console.log(sortedData);
 
   return (
-    <div className={cn("flex flex-col gap-4", className)}>
-      <div className="flex flex-wrap gap-2 items-center justify-between">
-        <div className="flex gap-2 items-center w-full sm:w-auto">
-          {filterComponent}
+    <div className={cn("flex flex-col gap-4 w-full", className)}>
+      <div className="flex flex-wrap gap-2 items-center justify-between w-full" >
+        <div className="w-full sm:w-fit ">
+          {!!searchPlaceholder&&(
+            <Input type="text" className="w-full sm:w-100 block border border-foreground/80" placeholder={searchPlaceholder} />
+          )}
         </div>
         {sortOptions && sortOptions.length > 0 && (
-          <select
-            className="select select-sm border border-gray-200"
-            value={sortKey}
-            onChange={(e) => setSortKey(e.target.value)}
+          <Select
+            defaultValue={"Select Value"}
+            onValueChange={(value) => setSortKey(value)}
           >
+             <SelectTrigger className="bg-background">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
             {sortOptions.map((s) => (
-              <option key={s.value} value={s.value}>
-                {s.label}
-              </option>
+            <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
             ))}
-          </select>
+            </SelectContent>
+          </Select>
         )}
       </div>
-      <div className="overflow-x-auto">
-        <table className="table table-zebra w-full text-sm">
-          <thead>
-            <tr>
-              {columns.map((col) => (
-                <th
-                  key={col.id}
-                  className={cn("font-semibold text-left py-2", col.className)}
-                >
-                  {col.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {sortedData.length === 0 ? (
-              <tr>
-                <td colSpan={columns.length} className="text-center py-4">
-                  No results found.
-                </td>
-              </tr>
-            ) : (
-              sortedData.map((row, i) => (
-                <tr key={i}>
-                  {columns.map((col) => (
-                    <td key={col.id} className={col.className}>
-                      {col.accessor(row)}
-                    </td>
-                  ))}
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      <div className="">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {sortedData.length === 0 ? (
+            <div className="col-span-full text-center py-4 border rounded bg-muted text-muted-foreground">
+              No results found.
+            </div>
+          ) : (
+            sortedData.map((row, i) => (
+              <motion.div
+                animate={{ filter: "blur(0px)" }}
+                initial={{ filter: "blur(10px)" }}
+                transition={{ duration: 0.2}}
+                layoutId={row.id}
+                key={row.id}
+               
+              >
+              
+                <Card className="gap-0">
+                  <CardHeader className="border-none ">
+                    <CardTitle className="text-sm">
+                      {columns
+                        .find((col) => col.id === "name" || col.id === "title")?.accessor
+                        ? columns.find((col) => col.id === "name" || col.id === "title")!.accessor(row)
+                        : row.name || row.title || "Untitled"}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-xs text-muted-foreground space-y-1 ">
+                    {columns
+                      .filter((col) => col.id !== "name" && col.id !== "title")
+                      .map((col) => (
+                        <div key={col.id}>
+                          <span className="font-medium">{col.header}:</span>{" "}
+                          <span>
+                            {col.accessor
+                              ? col.accessor(row)
+                              : row[col.id] ?? ""}
+                          </span>
+                        </div>
+                      ))}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))
+          )}
+        </div>
       </div>
       {pagination && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
+            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+            {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
+            {pagination.total} results
           </div>
           <div className="flex gap-2 items-center">
             <button

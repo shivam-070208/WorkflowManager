@@ -13,6 +13,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useTRPC } from "@/trpc/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { WorkflowIcon } from "lucide-react";
 
 type Workflow = {
   id: string;
@@ -27,6 +28,9 @@ const formatDate = (date: Date | string):string => {
     month: "short",
     day: "numeric",
     year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
   });
 };
 
@@ -44,8 +48,9 @@ export const WorkflowHeader = () => {
         console.error("Failed to create workflow", error); // replace with your own handling
       }});
   };
+  const isLoading = createWorkflows?.isPending;
   return (
-    <EntityHeader actionLabel="Add New" action={handleAddNew}>
+    <EntityHeader isPending={isLoading} actionLabel="Add New" action={handleAddNew}>
       <EntityHeaderContent
         heading="Workflows"
         subheading="Manage your workflows here"
@@ -53,14 +58,21 @@ export const WorkflowHeader = () => {
     </EntityHeader>
   );
 };
-
-export const WorkflowContainer = ({
-  children,
-}: {
-  children?: React.ReactNode;
-}) => {
+export const WorkflowContainer = ({children}:{
+  children?:React.ReactNode
+})=>{
+return(
+<EntityWrapper>
+<WorkflowHeader/>
+<EntityContent>
+{children}
+</EntityContent>
+</EntityWrapper>
+)
+}
+export const WorkflowList = () => {
   const [page, setPage] = useState(1);
-  const limit = 10;
+  const limit = 12;
   
   const { data } = useWorkflows({page, limit});
   const handlePageChange = (newPage: number) => {
@@ -76,6 +88,7 @@ export const WorkflowContainer = ({
           href={`/workflows/${row.id}`}
           className="text-primary hover:underline font-medium"
         >
+          <WorkflowIcon className="inline" />
           {row.name}
         </Link>
       ),
@@ -93,12 +106,10 @@ export const WorkflowContainer = ({
   ];
 
   return (
-    <EntityWrapper>
-      <WorkflowHeader  />
-      <EntityContent>
         <EntityTable
           data={data?.workflows || []}
           columns={columns}
+          searchPlaceholder="Search Workflow here"
           sortOptions={[
             { value: "name", label: "Name" },
             { value: "createdAt", label: "Created" },
@@ -115,8 +126,5 @@ export const WorkflowContainer = ({
               : undefined
           }
         />
-        {children}
-      </EntityContent>
-    </EntityWrapper>
   );
 };
