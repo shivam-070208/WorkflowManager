@@ -172,14 +172,13 @@ function EntityTable<T extends { [key: string]: any }>({
           No results found.
         </div>
       ) : (
-        sortedData.map((row, i) => (
+        sortedData.map((row, index) => (
           <motion.div
             animate={{ filter: "blur(0px)" }}
             initial={{ filter: "blur(10px)" }}
             transition={{ duration: 0.2 }}
-            layoutId={row.id}
-            key={row.id}
-          >
+            layoutId={row.id ?? `entity-${index}`}
+            key={row.id ?? index}          >
             <Card className="gap-0">
               <CardHeader className="border-none ">
                 <CardTitle className="text-sm">
@@ -219,7 +218,8 @@ function EntityTableHeader<T>({
 }: EntityTableHeaderProps<T>) {
   const { sortKey, setSortKey, setSearch } = useEntityContextValues();
   const [localSearch, setLocalSearch] = React.useState("");
-  let timerOut: NodeJS.Timeout | string | number | undefined;
+
+  
   const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -275,8 +275,8 @@ function EntityTableFooter({
   return (
     <div className={cn("flex justify-between items-center gap-4 mt-4 w-full", className)}>
       <div className="text-sm text-muted-foreground">
-        Showing {pagination.page} to {pagination.totalPages} of {pagination.total} results
-      </div>
+      Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+      + {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results      </div>
       <div className="flex items-center gap-2">
         <Button
           variant="outline"

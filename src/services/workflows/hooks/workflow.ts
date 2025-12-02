@@ -1,6 +1,6 @@
 import { useTRPC } from "@/trpc/client"
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { inferInput } from "@trpc/tanstack-react-query";
+
 
 
 

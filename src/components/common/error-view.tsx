@@ -17,7 +17,6 @@ const ErrorView = ({ error, resetErrorBoundary }: ErrorViewProps) => {
         type="button"
         onClick={() => {
           resetErrorBoundary();
-          console.clear();
         }}
         style={{
           marginTop: "1rem",

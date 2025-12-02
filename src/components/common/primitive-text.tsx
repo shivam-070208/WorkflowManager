@@ -119,6 +119,14 @@ const PrimitiveTextEdit = ({
   asChild?: boolean;
 }) => {
   const Comp = asChild ? Slot : "div";
+  
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      (e.currentTarget as HTMLElement).click();
+    }
+  };
+  
   return (
     <Comp
       aria-label="text-edit-button"
@@ -127,13 +135,13 @@ const PrimitiveTextEdit = ({
         className
       )}
       tabIndex={0}
+      onKeyDown={handleKeyDown}
       {...props}
     >
       {children}
     </Comp>
   );
 };
-
 export {
   PrimitiveText,
   PrimitiveTextEdit

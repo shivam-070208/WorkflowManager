@@ -5,11 +5,9 @@ import React, { Suspense } from "react";
 import { prefetchWorkflows } from "@/services/workflows/server/prefetch";
 import ErrorView from "@/components/common/error-view";
  function page() {
-   try {
+  
     prefetchWorkflows({page:1,limit:10});
-   } catch (error) {
-    console.log("here is the error")
-   }
+   
   return ( 
       <WorkflowContainer >
       <WorkflowListHeader />  

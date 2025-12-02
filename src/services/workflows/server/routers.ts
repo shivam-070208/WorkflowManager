@@ -58,7 +58,7 @@ export const workflowRouter = createTRPCRouter({
         where: {
           userId: ctx.auth.user.id,
           name:{
-            contains:input.search,
+            contains:input.search.trim(),
             mode:"insensitive"
           }
         },
