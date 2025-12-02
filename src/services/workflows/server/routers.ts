@@ -22,6 +22,15 @@ export const workflowRouter = createTRPCRouter({
       });
     }
   ),
+  getById:ProtectedProcedure.input(z.object({id:z.string()})).query(({input,ctx})=>{
+    return prisma.workflow.findFirst({
+      where:{
+        id:input.id,
+        userId:ctx.auth.user.id
+      }
+    })
+  })
+  ,
   updateName: ProtectedProcedure.input(
     z.object({ id: z.string(), name: z.string().min(1) })
   ).mutation(({ ctx, input }) => {
@@ -40,6 +49,7 @@ export const workflowRouter = createTRPCRouter({
     z.object({
       page: z.number().min(1).default(1),
       limit: z.number().min(1).max(100).default(12),
+      search:z.string().default("")
     }),
   ).query(async ({ ctx, input }) => {
     const skip = (input.page - 1) * input.limit;
@@ -47,6 +57,10 @@ export const workflowRouter = createTRPCRouter({
       prisma.workflow.findMany({
         where: {
           userId: ctx.auth.user.id,
+          name:{
+            contains:input.search.trim(),
+            mode:"insensitive"
+          }
         },
         skip,
         take: input.limit,
@@ -57,6 +71,10 @@ export const workflowRouter = createTRPCRouter({
       prisma.workflow.count({
         where: {
           userId: ctx.auth.user.id,
+          name:{
+            contains:input.search,
+            mode:"insensitive"
+          }
         },
       }),
     ]);

@@ -1,12 +1,18 @@
-import { WorkflowContainer,WorkflowList } from "@/services/workflows/components/Workflows";
+import { WorkflowContainer,WorkflowList,WorkflowListHeader } from "@/services/workflows/components/Workflows";
 import { HydrateClient } from "@/trpc/server";
+import { ErrorBoundary } from "react-error-boundary";
 import React, { Suspense } from "react";
 import { prefetchWorkflows } from "@/services/workflows/server/prefetch";
-function page() {
-  prefetchWorkflows({page:1,limit:10});
-  return (
+import ErrorView from "@/components/common/error-view";
+ function page() {
+  
+    prefetchWorkflows({page:1,limit:10});
+   
+  return ( 
       <WorkflowContainer >
+      <WorkflowListHeader />  
     <HydrateClient>
+      
       <Suspense
         fallback={
           <div className="flex items-center justify-center p-10">
@@ -14,7 +20,9 @@ function page() {
           </div>
         }
       >
+            <ErrorBoundary fallbackRender={ErrorView}>
         <WorkflowList />
+        </ErrorBoundary>
       </Suspense>
     </HydrateClient>
     </WorkflowContainer>

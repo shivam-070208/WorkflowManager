@@ -1,15 +1,46 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { PlusIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
-import {motion} from "motion/react"
-import React from "react";
+import { motion } from "motion/react";
+import React, { createContext, useContext } from "react";
 import { Button } from "../ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 
-export const EntityWrapper = ({
+interface EntityContextType {
+  sortKey: string;
+  setSortKey: (key: string) => void;
+  search: string;
+  setSearch: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const EntityContext = createContext<EntityContextType | null>(null);
+
+const useEntityContextValues = (): EntityContextType => {
+  const context = useContext(EntityContext);
+  if (!context) throw new Error("Entity Context must used with in Provider--->EntityContentProvider");
+  return context;
+};
+
+const EntityContentProvider = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  const [sortKey, setSortKey] = React.useState<string>("");
+  const [search, setSearch] = React.useState<string>("");
+  return (
+    <EntityContext.Provider value={{ sortKey, setSortKey, search, setSearch }}>
+      <div className={cn("flex-1 flex flex-col gap-4", className)}>{children}</div>
+    </EntityContext.Provider>
+  );
+};
+
+const EntityWrapper = ({
   children,
   className = "",
 }: {
@@ -27,19 +58,19 @@ type EntityHeaderProps =
       className?: string;
       actionLabel?: string;
       action: () => void;
-      isPending?:boolean;
+      isPending?: boolean;
       actionHref?: never;
     }
-    | {
+  | {
       children: React.ReactNode;
       className?: string;
-      isPending?:never;
+      isPending?: never;
       actionLabel?: string;
       action?: never;
       actionHref: string;
     };
 
-export const EntityHeader = ({
+const EntityHeader = ({
   children,
   className = "",
   actionLabel,
@@ -50,7 +81,7 @@ export const EntityHeader = ({
   <div
     className={cn(
       "flex flex-col gap-3  sm:flex-row sm:items-center sm:justify-between",
-      className,
+      className
     )}
   >
     <div>{children}</div>
@@ -72,14 +103,7 @@ export const EntityHeader = ({
   </div>
 );
 
-export const EntityContent = ({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => <div className={cn("flex-1", className)}>{children}</div>;
-export const EntityHeaderContent = ({
+const EntityHeaderContent = ({
   heading,
   subheading,
 }: {
@@ -104,30 +128,16 @@ type Column<T> = {
 type EntityTableProps<T> = {
   data: T[];
   columns: Column<T>[];
-  searchPlaceholder?: string;
-  filterComponent?: React.ReactNode;
-  sortOptions?: Array<{ value: string; label: string }>;
   className?: string;
-  pagination?: {
-    page: number;
-    totalPages: number;
-    total: number;
-    limit: number;
-    onPageChange: (page: number) => void;
-  };
 };
 
-export function EntityTable<T extends { [key: string]: any }>({
+function EntityTable<T extends { [key: string]: any }>({
   data,
   columns,
-  searchPlaceholder,
-  sortOptions,
   className = "",
-  pagination,
 }: EntityTableProps<T>) {
-  const [sortKey, setSortKey] = React.useState("");
+  const { sortKey } = useEntityContextValues();
   const [sortedData, setSortedData] = React.useState(data);
-
   React.useEffect(() => {
     let filtered = [...data];
     if (sortKey) {
@@ -136,12 +146,12 @@ export function EntityTable<T extends { [key: string]: any }>({
         filtered = [...filtered].sort((a, b) => {
           let aValue = col.accessor(a);
           let bValue = col.accessor(b);
-          if(typeof aValue == "object"){
+          if (typeof aValue == "object") {
             aValue = a[sortKey];
           }
-          if(typeof bValue == "object"){
-            bValue = b[sortKey]
-          }          
+          if (typeof bValue == "object") {
+            bValue = b[sortKey];
+          }
           if (typeof aValue === "string" && typeof bValue === "string") {
             return aValue.localeCompare(bValue);
           }
@@ -154,106 +164,147 @@ export function EntityTable<T extends { [key: string]: any }>({
     }
     setSortedData(filtered);
   }, [sortKey, data, columns]);
-console.log(sortedData);
 
   return (
-    <div className={cn("flex flex-col gap-4 w-full", className)}>
-      <div className="flex flex-wrap gap-2 items-center justify-between w-full" >
-        <div className="w-full sm:w-fit ">
-          {!!searchPlaceholder&&(
-            <Input type="text" className="w-full sm:w-100 block border border-foreground/80" placeholder={searchPlaceholder} />
-          )}
+    <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4", className)}>
+      {sortedData.length === 0 ? (
+        <div className="col-span-full text-center py-4 border rounded bg-muted text-muted-foreground">
+          No results found.
         </div>
-        {sortOptions && sortOptions.length > 0 && (
-          <Select
-            defaultValue={"Select Value"}
-            onValueChange={(value) => setSortKey(value)}
-          >
-             <SelectTrigger className="bg-background">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-            {sortOptions.map((s) => (
-            <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
-            ))}
-            </SelectContent>
-          </Select>
-        )}
-      </div>
-      <div className="">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sortedData.length === 0 ? (
-            <div className="col-span-full text-center py-4 border rounded bg-muted text-muted-foreground">
-              No results found.
-            </div>
-          ) : (
-            sortedData.map((row, i) => (
-              <motion.div
-                animate={{ filter: "blur(0px)" }}
-                initial={{ filter: "blur(10px)" }}
-                transition={{ duration: 0.2}}
-                layoutId={row.id}
-                key={row.id}
-               
-              >
-              
-                <Card className="gap-0">
-                  <CardHeader className="border-none ">
-                    <CardTitle className="text-sm">
-                      {columns
-                        .find((col) => col.id === "name" || col.id === "title")?.accessor
-                        ? columns.find((col) => col.id === "name" || col.id === "title")!.accessor(row)
-                        : row.name || row.title || "Untitled"}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-xs text-muted-foreground space-y-1 ">
-                    {columns
-                      .filter((col) => col.id !== "name" && col.id !== "title")
-                      .map((col) => (
-                        <div key={col.id}>
-                          <span className="font-medium">{col.header}:</span>{" "}
-                          <span>
-                            {col.accessor
-                              ? col.accessor(row)
-                              : row[col.id] ?? ""}
-                          </span>
-                        </div>
-                      ))}
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))
-          )}
-        </div>
-      </div>
-      {pagination && (
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
-            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-            {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
-            {pagination.total} results
-          </div>
-          <div className="flex gap-2 items-center">
-            <button
-              onClick={() => pagination.onPageChange(pagination.page - 1)}
-              disabled={pagination.page <= 1}
-              className="px-3 py-1 text-sm border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
-            >
-              Previous
-            </button>
-            <span className="text-sm">
-              Page {pagination.page} of {pagination.totalPages}
-            </span>
-            <button
-              onClick={() => pagination.onPageChange(pagination.page + 1)}
-              disabled={pagination.page >= pagination.totalPages}
-              className="px-3 py-1 text-sm border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
-            >
-              Next
-            </button>
-          </div>
-        </div>
+      ) : (
+        sortedData.map((row, index) => (
+          <motion.div
+            animate={{ filter: "blur(0px)" }}
+            initial={{ filter: "blur(10px)" }}
+            transition={{ duration: 0.2 }}
+            layoutId={row.id ?? `entity-${index}`}
+            key={row.id ?? index}          >
+            <Card className="gap-0">
+              <CardHeader className="border-none ">
+                <CardTitle className="text-sm">
+                  {columns.find((col) => col.id === "name" || col.id === "title")?.accessor
+                    ? columns.find((col) => col.id === "name" || col.id === "title")!.accessor(row)
+                    : row.name || row.title || "Untitled"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground space-y-1 ">
+                {columns
+                  .filter((col) => col.id !== "name" && col.id !== "title")
+                  .map((col) => (
+                    <div key={col.id}>
+                      <span className="font-medium">{col.header}:</span>{" "}
+                      <span>
+                        {col.accessor ? col.accessor(row) : row[col.id] ?? ""}
+                      </span>
+                    </div>
+                  ))}
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))
       )}
     </div>
   );
 }
+
+type EntityTableHeaderProps<T> = {
+  searchPlaceHolder?: string;
+  sortOptions: (T & { value: string; label: string })[];
+};
+
+function EntityTableHeader<T>({
+  searchPlaceHolder,
+  sortOptions,
+}: EntityTableHeaderProps<T>) {
+  const { sortKey, setSortKey, setSearch } = useEntityContextValues();
+  const [localSearch, setLocalSearch] = React.useState("");
+
+  
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setLocalSearch(val);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      setSearch(val);
+    }, 1000);
+  };
+  return (
+    <div className="flex justify-between gap-4 flex-col sm:flex-row w-full">
+      {searchPlaceHolder && (
+        <Input
+          type="text"
+          className="sm:w-100"
+          value={localSearch}
+          placeholder={searchPlaceHolder}
+          onChange={onSearchChange}
+        />
+      )}
+      <Select value={sortKey} onValueChange={(value) => setSortKey(value)}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select Sort Option" />
+        </SelectTrigger>
+        <SelectContent>
+          {sortOptions.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+type EntityTableFooterProps = {
+  className?: string;
+  pagination: {
+    page: number;
+    totalPages: number;
+    total: number;
+    limit: number;
+    onPageChange: (page: number) => void;
+  };
+};
+
+function EntityTableFooter({
+  className = "",
+  pagination,
+}: EntityTableFooterProps) {
+  return (
+    <div className={cn("flex justify-between items-center gap-4 mt-4 w-full", className)}>
+      <div className="text-sm text-muted-foreground">
+      Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+      + {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results      </div>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="icon-lg"
+          onClick={() => pagination.onPageChange(pagination.page - 1)}
+          disabled={pagination.page === 1}
+        >
+          <ChevronLeftIcon className="w-16 h-16" />
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => pagination.onPageChange(pagination.page + 1)}
+          disabled={pagination.page === pagination.totalPages}
+        >
+          <ChevronRightIcon className="w-16 h-16" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export {
+  useEntityContextValues,
+  EntityContentProvider,
+  EntityWrapper,
+  EntityHeader,
+  EntityHeaderContent,
+  EntityTable,
+  EntityTableHeader,
+  EntityTableFooter,
+};
