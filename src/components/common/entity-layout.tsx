@@ -123,11 +123,9 @@ export function EntityTable<T extends { [key: string]: any }>({
   searchPlaceholder,
   sortOptions,
   className = "",
-  pagination,
 }: EntityTableProps<T>) {
-  const [sortKey, setSortKey] = React.useState("");
+  const {sortKey} = useEntityContextValues();
   const [sortedData, setSortedData] = React.useState(data);
-
   React.useEffect(() => {
     let filtered = [...data];
     if (sortKey) {
