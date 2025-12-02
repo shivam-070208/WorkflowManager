@@ -1,13 +1,16 @@
 "use client";
 import {
-  EntityContent,
+  EntityContentProvider,
   EntityHeader,
   EntityHeaderContent,
   EntityWrapper,
   EntityTable,
+  EntityTableFooter,
+  useEntityContextValues,
+  EntityTableHeader,
 } from "@/components/common/entity-layout";
 import React, { useState } from "react";
-import { useCreateWorkflows, useWorkflows } from "@/hooks/use-workflows";
+import { useCreateWorkflows, useWorkflows } from "@/services/workflows/hooks/workflow";
 
 import Link from "next/link";
 import { toast } from "sonner";
@@ -64,21 +67,18 @@ export const WorkflowContainer = ({children}:{
 return(
 <EntityWrapper>
 <WorkflowHeader/>
-<EntityContent>
+<EntityContentProvider>
 {children}
-</EntityContent>
+</EntityContentProvider>
 </EntityWrapper>
 )
 }
 export const WorkflowList = () => {
-  const [page, setPage] = useState(1);
-  const limit = 12;
-  
-  const { data } = useWorkflows({page, limit});
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-  };
 
+  const [page, setPage] = useState<number>(1);
+  const limit = 12;
+  const {search} = useEntityContextValues();
+  const { data } = useWorkflows({page, limit,search});
   const columns = [
     {
       id: "name",
@@ -106,25 +106,29 @@ export const WorkflowList = () => {
   ];
 
   return (
+    <>
         <EntityTable
           data={data?.workflows || []}
           columns={columns}
-          searchPlaceholder="Search Workflow here"
-          sortOptions={[
-            { value: "name", label: "Name" },
-            { value: "createdAt", label: "Created" },
-          ]}
-          pagination={
-            data
-              ? {
-                  page: data.page,
-                  totalPages: data.totalPages,
-                  total: data.total,
-                  limit: data.limit,
-                  onPageChange: handlePageChange,
-                }
-              : undefined
-          }
-        />
+          />
+          <EntityTableFooter
+            pagination={{
+              page,
+              totalPages: data?.totalPages || 1,
+              total: data?.total || 0,
+              limit,
+              onPageChange: setPage,
+            }}
+          />
+          </>
   );
 };
+export const WorkflowListHeader = ()=>{
+  const sortOptions=[
+    { value: "name", label: "Name" },
+    { value: "createdAt", label: "Created" },
+  ]
+  return(
+    <EntityTableHeader sortOptions={sortOptions} searchPlaceHolder="Search your Workflow by name" />
+  )
+}
