@@ -59,7 +59,7 @@ const PrimitiveText: React.FC<PrimitiveTextProps> = ({
     <div className={cn("relative flex items-center group", className)} {...props}>
       {!editing ? (
         <>
-          <span className="wrap-break-word">{internalText}</span>
+          <span className="wrap-break-word outline-none">{internalText}</span>
           {editable && renderEditButton && (
             <PrimitiveTextEdit
               aria-label="text-edit-button"
