@@ -1,6 +1,7 @@
 import { NodeType, Workflow } from "@/generated/prisma/browser";
 import { prisma } from "@/lib/db";
 import { createTRPCRouter, ProtectedProcedure } from "@/trpc/init";
+import { Node } from "@xyflow/react";
 import {generateSlug} from "random-word-slugs"
 import z from "zod";
 
@@ -47,10 +48,10 @@ export const workflowRouter = createTRPCRouter({
       return null;
     }
 
-    const nodes = workflow.nodes.map((node) => ({
+    const nodes:Node[] = workflow.nodes.map((node) => ({
       id: node.id,
       type: node.type,
-      data: node.data,
+      data:typeof node.data==="object"?{...node.data}:{value:node.data},
       position: { x: 0, y: 0 },
       label: node.name,
     }));

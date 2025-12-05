@@ -93,16 +93,18 @@ model Workflow {
 enum NodeType {
   Initial
   GithubHooks
+  GoogleForm
+  ManualTrigger
 }
 
 model Node {
-  id         String @id @default(cuid())
+  id         String   @id @default(cuid())
   name       String
   data       Json   @default("{}")
   workflowId String
+  type       NodeType
 
-  workflow        Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
-  type            NodeType
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
   connectionsFrom Connection[] @relation("ConnectionFromNode")
   connectionsTo   Connection[] @relation("ConnectionToNode")
 

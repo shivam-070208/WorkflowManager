@@ -18,7 +18,7 @@ const Page = async ({ params }: Props) => {
             <HydrateClient>
                 <Suspense fallback={<LoaderView />}>
                     <EditorHeader workflowId={workflowId} />
-                    <Editor />
+                    <Editor workflowId={workflowId} />
                 </Suspense>
             </HydrateClient>
         </div>

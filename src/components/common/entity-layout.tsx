@@ -131,7 +131,7 @@ type EntityTableProps<T> = {
   className?: string;
 };
 
-function EntityTable<T extends { [key: string]: any }>({
+function EntityTable<T extends Record<string, any>>({
   data,
   columns,
   className = "",
