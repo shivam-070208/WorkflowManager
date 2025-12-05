@@ -15,16 +15,17 @@ datasource db {
 }
 
 model User {
-  id            String    @id
+  id            String     @id
   name          String
   email         String
-  emailVerified Boolean   @default(false)
+  emailVerified Boolean    @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
   workflows     Workflow[]
+
   @@unique([email])
   @@map("user")
 }
@@ -75,11 +76,53 @@ model Verification {
 }
 
 model Workflow {
-  id   String @id @default(cuid())
-  name String
+  id        String   @id @default(cuid())
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nodes       Node[]
+  connections Connection[]
+
+  @@unique([name, userId])
   @@map("workflow")
+}
+
+enum NodeType {
+  Initial
+  GithubHooks
+  GoogleForm
+  ManualTrigger
+}
+
+model Node {
+  id         String   @id @default(cuid())
+  name       String
+  data       Json   @default("{}")
+  workflowId String
+  type       NodeType
+
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  connectionsFrom Connection[] @relation("ConnectionFromNode")
+  connectionsTo   Connection[] @relation("ConnectionToNode")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Connection {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workflowId String
+  fromNode   String
+  toNode     String
+
+  from     Node     @relation("ConnectionFromNode", fields: [fromNode], references: [id], onDelete: Cascade)
+  to       Node     @relation("ConnectionToNode", fields: [toNode], references: [id], onDelete: Cascade)
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
 }

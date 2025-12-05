@@ -56,6 +56,7 @@
   --shadow-2xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.25);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
+
 }
 
 .dark {
@@ -163,7 +164,18 @@
   --shadow-2xl: 2px 3px 5px 0px hsl(28 13% 20% / 0.30);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
+
+
+
+  /* 
+  React Flow Variable Overwriting
+  */
+ --background-pattern-dots-color-default: oklch(0.8606 0.0321 84.5881); /* matches vintage theme border */
+
 }
+
+
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -225,5 +237,15 @@
   }
   button{
     @apply cursor-pointer;
+  }
+}
+/* 
+React flow styling
+*/
+:root {
+
+  &.vintage .react-flow{
+      --xy-background-pattern-dots-color-default: var(--background-pattern-dots-color-default);
+
   }
 }

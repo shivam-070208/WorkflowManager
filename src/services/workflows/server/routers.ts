@@ -1,5 +1,7 @@
+import { NodeType, Workflow } from "@/generated/prisma/browser";
 import { prisma } from "@/lib/db";
 import { createTRPCRouter, ProtectedProcedure } from "@/trpc/init";
+import { Node } from "@xyflow/react";
 import {generateSlug} from "random-word-slugs"
 import z from "zod";
 
@@ -9,6 +11,14 @@ export const workflowRouter = createTRPCRouter({
       data: {
         name: generateSlug(3),
         userId: ctx.auth.user.id,
+        nodes:{
+          create:[
+           {
+            name:generateSlug(3),
+            type:"Initial",
+           } 
+          ]
+        }
       },
     });
   }),
@@ -22,15 +32,42 @@ export const workflowRouter = createTRPCRouter({
       });
     }
   ),
-  getById:ProtectedProcedure.input(z.object({id:z.string()})).query(({input,ctx})=>{
-    return prisma.workflow.findFirst({
-      where:{
-        id:input.id,
-        userId:ctx.auth.user.id
-      }
-    })
-  })
-  ,
+  getById: ProtectedProcedure.input(z.object({ id: z.string() })).query(async ({ input, ctx }) => {
+    const workflow = await prisma.workflow.findUnique({
+      where: {
+        id: input.id,
+        userId: ctx.auth.user.id,
+      },
+      include: {
+        nodes: true,
+        connections: true,
+      },
+    });
+
+    if (!workflow) {
+      return null;
+    }
+
+    const nodes:Node[] = workflow.nodes.map((node) => ({
+      id: node.id,
+      type: node.type,
+      data:typeof node.data==="object"?{...node.data}:{value:node.data},
+      position: { x: 0, y: 0 },
+      label: node.name,
+    }));
+
+    const connections = workflow.connections.map((connection) => ({
+      id: connection.id,
+      source: connection.fromNode,
+      target: connection.toNode,
+    }));
+
+    return {
+      ...workflow,
+      nodes,
+      connections,
+    };
+  }),
   updateName: ProtectedProcedure.input(
     z.object({ id: z.string(), name: z.string().min(1) })
   ).mutation(({ ctx, input }) => {

@@ -15,6 +15,7 @@ import {
   useGetWorkflowById,
   useUpdateWorkflows,
 } from "@/services/workflows/hooks/workflow";
+import { toast } from "sonner";
 
 const EditorBreadCrumb = ({ workflowId }: { workflowId: string }) => {
 
@@ -27,7 +28,14 @@ const EditorBreadCrumb = ({ workflowId }: { workflowId: string }) => {
       workflow?.id &&
       !updateWorkflowName.isPending
     ) {
-      updateWorkflowName.mutate({ id: workflow.id, name: newName });
+      updateWorkflowName.mutate({ id: workflow.id, name: newName },{
+        onError:(e)=>{
+          toast("Something went wrong");
+        },
+        onSuccess:()=>{
+          toast.success("Workflow name updated");
+        }
+      });
     }
   };
   return (
