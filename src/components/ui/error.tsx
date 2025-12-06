@@ -1,10 +1,18 @@
-import React from 'react'
+import React from "react";
 
-const Error = ({children,enabled}:{children:React.ReactNode,enabled:boolean}) => {
-    if(!enabled) return null;
+const Error = ({
+  children,
+  enabled,
+}: {
+  children: React.ReactNode;
+  enabled: boolean;
+}) => {
+  if (!enabled) return null;
   return (
- <p className='w-full text-xs font-semibold transition-all text-red-500'>{children}</p>
-  )
-}
+    <p className="w-full text-xs font-semibold text-red-500 transition-all">
+      {children}
+    </p>
+  );
+};
 
-export {Error}
+export { Error };

@@ -12,11 +12,7 @@ import {
   SidebarHeader,
 } from "../ui/sidebar";
 import { Button } from "../ui/button";
-import {
-  LogOutIcon,
-  WorkflowIcon,
-  HistoryIcon,
-} from "lucide-react";
+import { LogOutIcon, WorkflowIcon, HistoryIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -28,7 +24,7 @@ import Image from "next/image";
 export default function AppSidebar() {
   const pathName = usePathname();
   const router = useRouter();
-  const {isActive,isLoading} = useListActivationSubscription();
+  const { isActive, isLoading } = useListActivationSubscription();
   const MenuItems = [
     {
       title: "main",
@@ -55,32 +51,32 @@ export default function AppSidebar() {
         },
         onError: () => {
           toast.error("Something went wrong");
-        }
-      }
+        },
+      },
     });
   };
-  const handleSubscribe = ()=>{
+  const handleSubscribe = () => {
     authClient.checkout({
-        slug: "Worflow-developement",
-        fetchOptions:{
-            onSuccess:()=>{
-                toast.success("Select plan and subscribe");
-            },
-            onError:(err)=>{
-                toast.error("Failed to start checkout");
-                console.error(err);
-            }
-        }
-      })
-    }
-    
-    return (
-      <Sidebar className="overflow-x-hidden" variant="sidebar" side="left">
+      slug: "Worflow-developement",
+      fetchOptions: {
+        onSuccess: () => {
+          toast.success("Select plan and subscribe");
+        },
+        onError: (err) => {
+          toast.error("Failed to start checkout");
+          console.error(err);
+        },
+      },
+    });
+  };
+
+  return (
+    <Sidebar className="overflow-x-hidden" variant="sidebar" side="left">
       <SidebarHeader>
         <SidebarMenuItem>
-          <SidebarMenuButton asChild className="hover:bg-sidebar ">
+          <SidebarMenuButton asChild className="hover:bg-sidebar">
             <Link href={"/"} prefetch className="flex gap-1 text-xl">
-            <Image src={"/logo.png"} width={50} height={50} alt={"logo"}/>
+              <Image src={"/logo.png"} width={50} height={50} alt={"logo"} />
               Home
             </Link>
           </SidebarMenuButton>
@@ -123,17 +119,18 @@ export default function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
         ))}
-
       </SidebarContent>
-        <SidebarSeparator />
+      <SidebarSeparator />
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-           {!isLoading && !isActive&& <SidebarMenuButton asChild>
-              <button className="cursor-pointer" onClick={handleSubscribe}  >
-                <IconStar /> Go to Pro
-              </button>
-            </SidebarMenuButton>}
+            {!isLoading && !isActive && (
+              <SidebarMenuButton asChild>
+                <button className="cursor-pointer" onClick={handleSubscribe}>
+                  <IconStar /> Go to Pro
+                </button>
+              </SidebarMenuButton>
+            )}
             <SidebarMenuButton asChild>
               <div className="cursor-pointer" onClick={handleLogout}>
                 <LogOutIcon /> Logout

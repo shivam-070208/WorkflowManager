@@ -1,9 +1,9 @@
-"use client"
-import {motion} from "motion/react";
+"use client";
+import { motion } from "motion/react";
 export default function LoaderView() {
   return (
-    <div className="w-full h-full min-h-100 flex items-center justify-center relative">
-      <div className="absolute inset-0 pointer-events-none">
+    <div className="relative flex h-full min-h-100 w-full items-center justify-center">
+      <div className="pointer-events-none absolute inset-0">
         <motion.div
           initial={{
             backgroundPosition: "200% 0%",
@@ -16,11 +16,9 @@ export default function LoaderView() {
             repeat: Infinity,
             ease: "linear",
           }}
-         
-          className="w-full h-full blur-sm bg-linear-to-br from-43% from-transparent via-50% via-[#3b82f6] to-60% to-transparent bg-size-[200%_200%]"
+          className="h-full w-full bg-linear-to-br from-transparent from-43% via-[#3b82f6] via-50% to-transparent to-60% bg-size-[200%_200%] blur-sm"
         />
       </div>
-      
     </div>
   );
 }

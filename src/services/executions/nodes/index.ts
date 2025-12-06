@@ -1,12 +1,6 @@
-import InitialNode from "./initial/components/initial";
-
-
+import ManualTriggerNode from "./manual/manual-trigger";
 
 
 export {
-    InitialNode
-};
-
-export const NodesTypes={
-    Initial:InitialNode
+    ManualTriggerNode
 }

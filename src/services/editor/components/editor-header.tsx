@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/common/theme-toggle";
@@ -10,7 +10,7 @@ import {
   BreadcrumbLink,
 } from "@/components/ui/breadcrumb";
 import { WorkflowIcon } from "lucide-react";
-import { PrimitiveText } from "@/components/common/primitive-text";
+import { MutableText } from "@/components/common/mutable-text"
 import {
   useGetWorkflowById,
   useUpdateWorkflows,
@@ -18,7 +18,6 @@ import {
 import { toast } from "sonner";
 
 const EditorBreadCrumb = ({ workflowId }: { workflowId: string }) => {
-
   const { data: workflow } = useGetWorkflowById(workflowId);
   const updateWorkflowName = useUpdateWorkflows();
   const onConfirm = (newName: string) => {
@@ -28,14 +27,17 @@ const EditorBreadCrumb = ({ workflowId }: { workflowId: string }) => {
       workflow?.id &&
       !updateWorkflowName.isPending
     ) {
-      updateWorkflowName.mutate({ id: workflow.id, name: newName },{
-        onError:(e)=>{
-          toast("Something went wrong");
+      updateWorkflowName.mutate(
+        { id: workflow.id, name: newName },
+        {
+          onError: (e) => {
+            toast("Something went wrong");
+          },
+          onSuccess: () => {
+            toast.success("Workflow name updated");
+          },
         },
-        onSuccess:()=>{
-          toast.success("Workflow name updated");
-        }
-      });
+      );
     }
   };
   return (
@@ -48,7 +50,7 @@ const EditorBreadCrumb = ({ workflowId }: { workflowId: string }) => {
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <PrimitiveText
+          <MutableText
             text={workflow?.name || "Untitled"}
             editable
             onConfirm={onConfirm}
@@ -62,9 +64,9 @@ const EditorBreadCrumb = ({ workflowId }: { workflowId: string }) => {
 
 const EditorHeader = ({ workflowId }: { workflowId: string }) => {
   return (
-    <div className="w-full flex justify-between items-center px-4 py-4">
-      <div className="flex gap-2 items-center">
-        <SidebarTrigger className="text-lg " />
+    <div className="flex w-full items-center justify-between px-4 py-4">
+      <div className="flex items-center gap-2">
+        <SidebarTrigger className="text-lg" />
         <EditorBreadCrumb workflowId={workflowId} />
       </div>
       <ThemeToggle />

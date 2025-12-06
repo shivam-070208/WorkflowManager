@@ -13,7 +13,7 @@ interface PrimitiveTextProps extends React.ComponentProps<"div"> {
   inputClassName?: string;
 }
 
-const PrimitiveText: React.FC<PrimitiveTextProps> = ({
+const MutableText: React.FC<PrimitiveTextProps> = ({
   text,
   className,
   editable = true,
@@ -56,21 +56,24 @@ const PrimitiveText: React.FC<PrimitiveTextProps> = ({
   };
 
   return (
-    <div className={cn("relative flex items-center group", className)} {...props}>
+    <div
+      className={cn("group relative flex items-center", className)}
+      {...props}
+    >
       {!editing ? (
         <>
           <span className="wrap-break-word outline-none">{internalText}</span>
           {editable && renderEditButton && (
-            <PrimitiveTextEdit
+            <MutableTextEdit
               aria-label="text-edit-button"
               className={cn(
-                "ml-2 opacity-0 group-hover:opacity-100 transition-opacity",
-                editButtonClassName
+                "ml-2 opacity-0 transition-opacity group-hover:opacity-100",
+                editButtonClassName,
               )}
               onClick={() => setEditing(true)}
             >
-              <Pencil className="w-4 h-4" />
-            </PrimitiveTextEdit>
+              <Pencil className="h-4 w-4" />
+            </MutableTextEdit>
           )}
         </>
       ) : (
@@ -78,12 +81,12 @@ const PrimitiveText: React.FC<PrimitiveTextProps> = ({
           <input
             ref={inputRef}
             className={cn(
-              "border rounded px-2 py-1 text-sm mr-2 outline-none focus:ring-1 focus:ring-primary",
-              inputClassName
+              "focus:ring-primary mr-2 rounded border px-2 py-1 text-sm outline-none focus:ring-1",
+              inputClassName,
             )}
             value={value}
-            onChange={e => setValue(e.target.value)}
-            onKeyDown={e => {
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={(e) => {
               if (e.key === "Enter") handleConfirm();
               if (e.key === "Escape") handleCancel();
             }}
@@ -91,18 +94,18 @@ const PrimitiveText: React.FC<PrimitiveTextProps> = ({
           <button
             type="button"
             aria-label="confirm"
-            className="ml-1 size-6 rounded-full flex items-center justify-center transition-colors"
+            className="ml-1 flex size-6 items-center justify-center rounded-full transition-colors"
             onClick={handleConfirm}
           >
-            <Check className="w-4 h-4" />
+            <Check className="h-4 w-4" />
           </button>
           <button
             type="button"
             aria-label="cancel"
-            className="ml-1 size-6 rounded-full flex items-center justify-center bg-destructive hover:bg-destructive/50 text-destructive-foreground transition-colors"
+            className="bg-destructive hover:bg-destructive/50 text-destructive-foreground ml-1 flex size-6 items-center justify-center rounded-full transition-colors"
             onClick={handleCancel}
           >
-            <X className="w-4 h-4" />
+            <X className="h-4 w-4" />
           </button>
         </>
       )}
@@ -110,7 +113,7 @@ const PrimitiveText: React.FC<PrimitiveTextProps> = ({
   );
 };
 
-const PrimitiveTextEdit = ({
+const MutableTextEdit = ({
   className,
   asChild = false,
   children,
@@ -119,20 +122,20 @@ const PrimitiveTextEdit = ({
   asChild?: boolean;
 }) => {
   const Comp = asChild ? Slot : "div";
-  
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       (e.currentTarget as HTMLElement).click();
     }
   };
-  
+
   return (
     <Comp
       aria-label="text-edit-button"
       className={cn(
-        "size-8 rounded-full cursor-pointer flex items-center justify-center hover:bg-accent transition-colors",
-        className
+        "hover:bg-accent flex size-8 cursor-pointer items-center justify-center rounded-full transition-colors",
+        className,
       )}
       tabIndex={0}
       onKeyDown={handleKeyDown}
@@ -142,7 +145,4 @@ const PrimitiveTextEdit = ({
     </Comp>
   );
 };
-export {
-  PrimitiveText,
-  PrimitiveTextEdit
-};
+export { MutableText, MutableTextEdit };

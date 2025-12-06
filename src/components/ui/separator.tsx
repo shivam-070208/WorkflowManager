@@ -1,11 +1,11 @@
 import { cn } from "@/lib/utils";
 
-const Separator = ({ height }: { height?: number }) => {
+const Separator = ({ className }: {className?: string }) => {
   return (
     <div
       className={cn(
-        "my-8  w-full bg-linear-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700",
-        !height ? "h-1" : `h-[${height}px]`
+        " w-full bg-linear-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700 h-1",
+      className
       )}
     />
   );

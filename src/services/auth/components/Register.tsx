@@ -88,42 +88,40 @@ export default function RegisterForm() {
     resolver: zodResolver(signupformValues),
   });
   const handleGithubAuth = async (mode: "login" | "signup") => {
-    const toastId = toast.loading(mode === "signup" ? "Signing up with Github" : "Logging in with Github");
+    const toastId = toast.loading(
+      mode === "signup" ? "Signing up with Github" : "Logging in with Github",
+    );
     try {
-      await authClient.signIn.social(
-        {
-          provider:"github",
-          callbackURL:"/workflows",
-          fetchOptions:{
-            onResponse:()=>{
-              toast.dismiss(toastId);
-              toast.success("Logged in successfully redirecting");
-              
-            }
-          }
-        }
-      );
+      await authClient.signIn.social({
+        provider: "github",
+        callbackURL: "/workflows",
+        fetchOptions: {
+          onResponse: () => {
+            toast.dismiss(toastId);
+            toast.success("Logged in successfully redirecting");
+          },
+        },
+      });
     } catch (err) {
       toast.dismiss(toastId);
       toast.error("Authentication failed.");
     }
   };
   const handleGoogleAuth = async (mode: "login" | "signup") => {
-    const toastId = toast.loading(mode === "signup" ? "Signing up with Github" : "Logging in with google");
+    const toastId = toast.loading(
+      mode === "signup" ? "Signing up with Github" : "Logging in with google",
+    );
     try {
-      await authClient.signIn.social(
-        {
-          provider:"google",
-          callbackURL:"/workflows",
-          fetchOptions:{
-            onResponse:()=>{
-              toast.dismiss(toastId);
-              toast.success("Logged in successfully redirecting");
-              
-            }
-          }
-        }
-      );
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/workflows",
+        fetchOptions: {
+          onResponse: () => {
+            toast.dismiss(toastId);
+            toast.success("Logged in successfully redirecting");
+          },
+        },
+      });
     } catch (err) {
       toast.dismiss(toastId);
       toast.error("Authentication failed.");
@@ -147,9 +145,9 @@ export default function RegisterForm() {
           },
           onError: (err: ErrorContext) => {
             toast.dismiss(toastId);
-         
+
             // Try to get a meaningful error message
-            let errorMessage =err.error.message||"something went wrong";
+            let errorMessage = err.error.message || "something went wrong";
             toast.error(errorMessage);
           },
         },
@@ -170,7 +168,7 @@ export default function RegisterForm() {
   };
   const isPending = form.formState.isSubmitting;
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="mx-auto w-full max-w-md">
       <CardHeader className="text-center">
         <Image
           src="/logo.png"
@@ -183,7 +181,7 @@ export default function RegisterForm() {
         <CardDescription>Create your account to continue</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-2">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="mt-2 space-y-8">
           {Object.entries(signupFormInputs).map(([key, value]) => (
             <LabelInputContainer key={key}>
               <Label>{key.toLocaleUpperCase()}</Label>
@@ -209,35 +207,34 @@ export default function RegisterForm() {
           <Button
             type="submit"
             disabled={isPending}
-            className="w-full bg-primary group/btn disabled:blue-sm  cursor-pointer text-white"
+            className="bg-primary group/btn disabled:blue-sm w-full cursor-pointer text-white"
           >
             Sign Up
             <BottomGradient />
           </Button>
           <div className="text-center text-sm">
             Already have an account?
-            <Link href={"/login"} className="underline text-blue-500 ml-1">
+            <Link href={"/login"} className="ml-1 text-blue-500 underline">
               Login
             </Link>
           </div>
         </form>
-        <Separator />
-        <CardFooter className="px-0 gap-4">
-        <Button
-              disabled={isPending}
-              className="w-full group/btn bg-secondary text-secondary-foreground cursor-pointer flex"
-              onClick={() => handleGithubAuth("login")}
-              type="button"
-            >
-              <IconBrandGithub /> Signup With Github
-              <BottomGradient />
-            </Button>
+        <Separator className="my-4" />
+        <CardFooter className="gap-4 px-0">
+          <Button
+            disabled={isPending}
+            className="group/btn bg-secondary text-secondary-foreground flex w-full cursor-pointer"
+            onClick={() => handleGithubAuth("login")}
+            type="button"
+          >
+            <IconBrandGithub /> Signup With Github
+            <BottomGradient />
+          </Button>
 
           <Button
             disabled={isPending}
-            onClick={()=>handleGoogleAuth("login")}
-            className="w-full group/btn cursor-pointer bg-primary text-white flex"
-
+            onClick={() => handleGoogleAuth("login")}
+            className="group/btn bg-primary flex w-full cursor-pointer text-white"
           >
             <IconBrandGoogle /> Continue With Google
             <BottomGradient />

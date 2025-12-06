@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+"react-hooks/set-state-in-effect"
 ]);
 
 export default eslintConfig;
