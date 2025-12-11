@@ -91,6 +91,74 @@ export const workflowRouter = createTRPCRouter({
     });
   }),
 
+  
+  update:ProtectedProcedure.input(
+    z.object({
+      id:z.string(),
+      nodes:z.array(z.object({
+        id:z.string(),
+        data:z.record(z.string(),z.any()),
+        position:z.object({
+          x:z.number(),
+          y:z.number()
+        }),
+        type:z.enum(NodeType),
+        label:z.string()
+      })),
+      edges:z.array(z.object({
+        source:z.string(),
+        target:z.string(),
+        label:z.string().default("")
+      }))
+    })).mutation(async ({input,ctx})=>{
+      const {id,nodes,edges} = input;
+      await prisma.$transaction(async (tx)=>{
+        await prisma.workflow.findFirstOrThrow({
+           where:{
+             id:id,
+             userId:ctx.auth.user.id
+           }
+         });
+        await tx.node.deleteMany({
+          where:{
+            workflowId:id,
+          }
+        });
+       await tx.node.createMany({
+        data:nodes.map((node)=>({
+          id:`${id}_${node.id}`,
+          workflowId:id,
+          data:node.data,
+          position:{
+            x:node.position.x,
+            y:node.position.y
+          },  
+          type:node.type,
+          name:generateSlug(3)
+        }))
+       })
+       await tx.connection.createMany({
+        data:edges.map((edge)=>({
+         workflowId:id,
+         fromNode:`${id}_${edge.source}`,
+         toNode:`${id}_${edge.target}`,
+          name:edge.label
+        }))
+       });
+       await tx.workflow.update({
+        where:{
+          id:id
+        },
+        data:{
+          updatedAt:new Date()
+        }
+       })
+    })
+    return {
+      success:true
+    }
+  })
+  ,
   getAll: ProtectedProcedure.input(
     z.object({
       page: z.number().min(1).default(1),

@@ -9,17 +9,21 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
 } from "@/components/ui/breadcrumb";
-import { WorkflowIcon } from "lucide-react";
+import { SaveIcon, WorkflowIcon } from "lucide-react";
 import { MutableText } from "@/components/common/mutable-text"
 import {
   useGetWorkflowById,
-  useUpdateWorkflows,
+  useUpdateWorkflow,
+  useUpdateWorkflowName,
 } from "@/services/workflows/hooks/workflow";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { useReactFlow } from "@xyflow/react";
+import { NodeType } from "@/generated/prisma/enums";
 
 const EditorBreadCrumb = ({ workflowId }: { workflowId: string }) => {
   const { data: workflow } = useGetWorkflowById(workflowId);
-  const updateWorkflowName = useUpdateWorkflows();
+  const updateWorkflowName = useUpdateWorkflowName();
   const onConfirm = (newName: string) => {
     if (
       newName &&
@@ -62,14 +66,53 @@ const EditorBreadCrumb = ({ workflowId }: { workflowId: string }) => {
   );
 };
 
+const EditorSaveButton=({workflowId}:{workflowId:string})=>{
+  const {isPending,mutate :update} = useUpdateWorkflow();
+  const {getEdges,getNodes} = useReactFlow();
+  const updateWorkflow=()=>{
+    update({
+      id: workflowId,
+      nodes: getNodes().map(node => ({
+        id: node.id,
+        data: node.data,
+        position: typeof node.position === "object" && node.position !== null
+          ? { x: (node.position as any).x ?? 0, y: (node.position as any).y ?? 0 }
+          : { x: 0, y: 0 },
+        type: (node.type as "Initial" | "GithubHooks" | "GoogleForm" | "ManualTrigger" | "Webhook") ?? "ManualTrigger",
+        label: (node as any).label ?? "", 
+      })),
+      edges: getEdges().map(edge => ({
+        source: edge.source,
+        target: edge.target,
+        label: typeof edge.label === "string" ? edge.label : undefined,
+      })),
+    }, {
+      onSuccess: () => {
+        toast.success("Saved successfully");
+      },
+      onError: () => {
+        toast.error("Failed to save workflow");
+      },
+    })
+  }
+  return(
+    <Button size={"sm"} onClick={updateWorkflow} disabled={isPending} className="flex px-3 bg-primary w-fit ">
+      <SaveIcon size={4} />Save 
+    </Button>
+  )
+}
+
 const EditorHeader = ({ workflowId }: { workflowId: string }) => {
   return (
-    <div className="flex w-full items-center justify-between px-4 py-4">
+    <div className="flex w-full  items-center justify-between  py-4 px-5">
       <div className="flex items-center gap-2">
         <SidebarTrigger className="text-lg" />
         <EditorBreadCrumb workflowId={workflowId} />
       </div>
-      <ThemeToggle />
+      <div className="flex gap-2 ">
+    <EditorSaveButton workflowId={workflowId} />
+    <ThemeToggle />
+      </div>
     </div>
   );
 };

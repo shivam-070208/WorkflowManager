@@ -1,5 +1,4 @@
 import React, { Suspense } from "react";
-import EditorHeader from "@/services/editor/components/editor-header";
 import { prefetchWorkflowById } from "@/services/workflows/server/prefetch";
 import { HydrateClient } from "@/trpc/server";
 import LoaderView from "@/components/common/loading-view";
@@ -16,11 +15,10 @@ const Page = async ({ params }: Props) => {
   const { workflowId } = await params;
   prefetchWorkflowById({ id: workflowId });
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 w-full flex-col">
       <HydrateClient>
         <ErrorBoundary fallbackRender={ErrorView}>
           <Suspense fallback={<LoaderView />}>
-            <EditorHeader workflowId={workflowId} />
             <Editor workflowId={workflowId} />
           </Suspense>
         </ErrorBoundary>

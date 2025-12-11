@@ -20,7 +20,12 @@ export const useGetWorkflowById = (id: string) => {
   return useSuspenseQuery(trpc.workflow.getById.queryOptions({ id }));
 };
 
-export const useUpdateWorkflows = () => {
+export const useUpdateWorkflowName = () => {
   const trpc = useTRPC();
   return useMutation(trpc.workflow.updateName.mutationOptions());
 };
+export const useUpdateWorkflow = () =>{
+const trpc = useTRPC();
+return useMutation(trpc.workflow.update.mutationOptions());
+
+}

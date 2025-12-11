@@ -249,7 +249,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground max-w-dvw overflow-x-hidden;
+    @apply bg-background text-foreground w-dvw ;
   }
   button {
     @apply cursor-pointer;
