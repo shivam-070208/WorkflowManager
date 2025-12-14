@@ -5,7 +5,13 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import React, { createContext, useContext } from "react";
 import { Button } from "../ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 
@@ -20,7 +26,10 @@ const EntityContext = createContext<EntityContextType | null>(null);
 
 const useEntityContextValues = (): EntityContextType => {
   const context = useContext(EntityContext);
-  if (!context) throw new Error("Entity Context must used with in Provider--->EntityContentProvider");
+  if (!context)
+    throw new Error(
+      "Entity Context must used with in Provider--->EntityContentProvider",
+    );
   return context;
 };
 
@@ -35,7 +44,9 @@ const EntityContentProvider = ({
   const [search, setSearch] = React.useState<string>("");
   return (
     <EntityContext.Provider value={{ sortKey, setSortKey, search, setSearch }}>
-      <div className={cn("flex-1 flex flex-col gap-4", className)}>{children}</div>
+      <div className={cn("flex flex-1 flex-col gap-4", className)}>
+        {children}
+      </div>
     </EntityContext.Provider>
   );
 };
@@ -47,7 +58,7 @@ const EntityWrapper = ({
   children: React.ReactNode;
   className?: string;
 }) => (
-  <div className={cn("flex-1 flex flex-col gap-6 p-6 sm:p-10", className)}>
+  <div className={cn("flex flex-1 flex-col gap-6 p-6 sm:p-10", className)}>
     {children}
   </div>
 );
@@ -80,13 +91,13 @@ const EntityHeader = ({
 }: EntityHeaderProps) => (
   <div
     className={cn(
-      "flex flex-col gap-3  sm:flex-row sm:items-center sm:justify-between",
-      className
+      "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",
+      className,
     )}
   >
     <div>{children}</div>
     {!!actionLabel && !action && actionHref && (
-      <Link href={actionHref} className=" text-primary  hover:opacity-80">
+      <Link href={actionHref} className="text-primary hover:opacity-80">
         {actionLabel}
       </Link>
     )}
@@ -113,7 +124,7 @@ const EntityHeaderContent = ({
   <div>
     <div className="text-3xl font-semibold">{heading}</div>
     {subheading && (
-      <div className="text-sm text-muted-foreground">{subheading}</div>
+      <div className="text-muted-foreground text-sm">{subheading}</div>
     )}
   </div>
 );
@@ -166,9 +177,14 @@ function EntityTable<T extends Record<string, any>>({
   }, [sortKey, data, columns]);
 
   return (
-    <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4", className)}>
+    <div
+      className={cn(
+        "grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3",
+        className,
+      )}
+    >
       {sortedData.length === 0 ? (
-        <div className="col-span-full text-center py-4 border rounded bg-muted text-muted-foreground">
+        <div className="bg-muted text-muted-foreground col-span-full rounded border py-4 text-center">
           No results found.
         </div>
       ) : (
@@ -178,23 +194,28 @@ function EntityTable<T extends Record<string, any>>({
             initial={{ filter: "blur(10px)" }}
             transition={{ duration: 0.2 }}
             layoutId={row.id ?? `entity-${index}`}
-            key={row.id ?? index}          >
+            key={row.id ?? index}
+          >
             <Card className="gap-0">
-              <CardHeader className="border-none ">
+              <CardHeader className="border-none">
                 <CardTitle className="text-sm">
-                  {columns.find((col) => col.id === "name" || col.id === "title")?.accessor
-                    ? columns.find((col) => col.id === "name" || col.id === "title")!.accessor(row)
+                  {columns.find(
+                    (col) => col.id === "name" || col.id === "title",
+                  )?.accessor
+                    ? columns
+                        .find((col) => col.id === "name" || col.id === "title")!
+                        .accessor(row)
                     : row.name || row.title || "Untitled"}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-xs text-muted-foreground space-y-1 ">
+              <CardContent className="text-muted-foreground space-y-1 text-xs">
                 {columns
                   .filter((col) => col.id !== "name" && col.id !== "title")
                   .map((col) => (
                     <div key={col.id}>
                       <span className="font-medium">{col.header}:</span>{" "}
                       <span>
-                        {col.accessor ? col.accessor(row) : row[col.id] ?? ""}
+                        {col.accessor ? col.accessor(row) : (row[col.id] ?? "")}
                       </span>
                     </div>
                   ))}
@@ -219,7 +240,6 @@ function EntityTableHeader<T>({
   const { sortKey, setSortKey, setSearch } = useEntityContextValues();
   const [localSearch, setLocalSearch] = React.useState("");
 
-  
   const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -231,7 +251,7 @@ function EntityTableHeader<T>({
     }, 1000);
   };
   return (
-    <div className="flex justify-between gap-4 flex-col sm:flex-row w-full">
+    <div className="flex w-full flex-col justify-between gap-4 sm:flex-row">
       {searchPlaceHolder && (
         <Input
           type="text"
@@ -273,10 +293,17 @@ function EntityTableFooter({
   pagination,
 }: EntityTableFooterProps) {
   return (
-    <div className={cn("flex justify-between items-center gap-4 mt-4 w-full", className)}>
-      <div className="text-sm text-muted-foreground">
-      Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-      + {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results      </div>
+    <div
+      className={cn(
+        "mt-4 flex w-full items-center justify-between gap-4",
+        className,
+      )}
+    >
+      <div className="text-muted-foreground text-sm">
+        Showing {(pagination.page - 1) * pagination.limit + 1} to +{" "}
+        {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
+        {pagination.total} results{" "}
+      </div>
       <div className="flex items-center gap-2">
         <Button
           variant="outline"
@@ -284,14 +311,14 @@ function EntityTableFooter({
           onClick={() => pagination.onPageChange(pagination.page - 1)}
           disabled={pagination.page === 1}
         >
-          <ChevronLeftIcon className="w-16 h-16" />
+          <ChevronLeftIcon className="h-16 w-16" />
         </Button>
         <Button
           variant="outline"
           onClick={() => pagination.onPageChange(pagination.page + 1)}
           disabled={pagination.page === pagination.totalPages}
         >
-          <ChevronRightIcon className="w-16 h-16" />
+          <ChevronRightIcon className="h-16 w-16" />
         </Button>
       </div>
     </div>

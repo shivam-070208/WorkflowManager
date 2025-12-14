@@ -1,5 +1,5 @@
 import AppSidebar from "@/components/common/app-sidebar";
-import {   SidebarProvider,SidebarMenuAction } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarMenuAction } from "@/components/ui/sidebar";
 import { authRequire } from "@/lib/auth-utils";
 
 export default async function Layout({
@@ -7,7 +7,7 @@ export default async function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-    await authRequire();
+  await authRequire();
   return (
     <SidebarProvider>
       <AppSidebar />

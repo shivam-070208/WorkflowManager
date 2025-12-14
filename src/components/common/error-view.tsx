@@ -7,12 +7,12 @@ interface ErrorViewProps {
 }
 
 const ErrorView = ({ error, resetErrorBoundary }: ErrorViewProps) => {
-
-
   return (
     <div>
       <h2>Something went wrong.</h2>
-      <pre style={{ color: "red", whiteSpace: "pre-wrap" }}>{error?.message}</pre>
+      <pre style={{ color: "red", whiteSpace: "pre-wrap" }}>
+        {error?.message}
+      </pre>
       <button
         type="button"
         onClick={() => {

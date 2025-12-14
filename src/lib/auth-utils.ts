@@ -7,15 +7,14 @@ export const authRequire = async () => {
     headers: await headers(),
   });
 
-  
-  if(!session) redirect("/login");
+  if (!session) redirect("/login");
 };
 export const unauthRequire = async () => {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
-    if (session) {
-      let redirectPath = "/workflows";
-      redirect(redirectPath);
-    }  };
-  
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (session) {
+    let redirectPath = "/workflows";
+    redirect(redirectPath);
+  }
+};
