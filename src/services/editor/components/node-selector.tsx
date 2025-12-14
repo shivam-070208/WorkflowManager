@@ -86,7 +86,9 @@ const NodeSelector = ({
   }
   return (
     <Sheet open={isOpen} onOpenChange={(open)=>setOpen(open)} {...props}>
-        <SheetTrigger asChild className={className}>{children}</SheetTrigger>
+        <SheetTrigger asChild className={className}>
+         <div> {children}
+          </div></SheetTrigger>
        <SheetContent >
       <SheetHeader className="flex  justify-between">
        <SheetTitle>Select Node Type</SheetTitle>

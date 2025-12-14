@@ -24,6 +24,7 @@ import { useGetWorkflowById } from "@/services/workflows/hooks/workflow";
 import { NodesTypes } from "@/config/nodes/node-types";
 import AddNode from "./add-node";
 import EditorHeader from "./editor-header";
+import { EmptyNode } from "@/config/nodes/data";
 
 type EditorProps = {
   workflowId: string;
@@ -38,23 +39,26 @@ const Editor: React.FC<EditorProps> = ({ workflowId }) => (
 
 const Canvas: React.FC<EditorProps> = ({ workflowId }) => {
   const {  resolvedTheme } = useTheme(); 
-  const { data, isLoading, error } = useGetWorkflowById(workflowId);
+  const { data, isLoading } = useGetWorkflowById(workflowId);
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const CanvaRef = useRef<HTMLDivElement | null>(null);
 
-  const ThemeOption: ('dark' | 'light')[] = ["dark", "light"];
+ 
 
   useEffect(() => {
     if (!isLoading && data && CanvaRef && CanvaRef.current) {
-      const updatedNodes = [...data.nodes];
+      const updatedNodes:Node[] = [...data.nodes];
+      if(updatedNodes.length === 0){
+       updatedNodes.push(EmptyNode)
+     }
       if (updatedNodes.length === 1 && updatedNodes[0].type === "Initial") {
         const Rect = CanvaRef.current.getBoundingClientRect();
         updatedNodes[0].position = {
           x: (window.innerWidth - Rect.left) / 2,
           y: (window.innerHeight - Rect.top) / 2,
         };
-      }
+      } 
       setNodes(updatedNodes);
     }
   }, [isLoading, data]);
@@ -83,11 +87,7 @@ const onDelete: OnDelete = useCallback((params)=>console.log(params),[]);
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onDelete={onDelete}
-        colorMode={
-        (resolvedTheme &&ThemeOption.includes(resolvedTheme as "light" | "dark" ))
-            ? (resolvedTheme as "light" | "dark")
-            : "system"
-        }
+        colorMode={resolvedTheme ? (resolvedTheme as "light" | "dark"| "system") :undefined}
       >
         <Background />
         <Controls />

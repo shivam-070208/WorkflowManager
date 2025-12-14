@@ -1,21 +1,22 @@
 "use client";
 
-import React from "react";
+import React, { memo } from "react";
 import {
-    BaseNode,
     BaseNodeContent,
-    BaseNodeFooter
 } from "@/components/react-flow/base-node";
-import { IconCursorOff } from "@tabler/icons-react";
-const ManualTriggerNode:React.FC = () => {
+import { MousePointerClick } from "lucide-react";
+import WorkflowNode from "@/components/react-flow/workflow-node";
+
+
+const ManualTriggerNode:React.FC = memo(() => {
     return(
-        <BaseNode>
-        <BaseNodeContent className="w-auto h-auto flex justify-center items-center">
-        <IconCursorOff size={10} />
+        <WorkflowNode left={false} className="rounded-l-full">
+        <BaseNodeContent className="w-auto h-auto flex  justify-center items-center">
+        <MousePointerClick size={30} />
         </BaseNodeContent>
-        </BaseNode>
+        </WorkflowNode>
     )
-}
+})
 
 
 export default ManualTriggerNode;
