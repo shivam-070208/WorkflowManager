@@ -24,11 +24,6 @@ const themeOptions = [
     icon: <Moon className="h-4 w-4 text-blue-900 dark:text-blue-300" />,
   },
   {
-    value: "system",
-    label: "System",
-    icon: <Laptop2 className="text-muted-foreground h-4 w-4" />,
-  },
-  {
     value: "vintage",
     label: "Vintage",
     icon: <Camera className="h-4 w-4 text-amber-700 dark:text-amber-400" />,

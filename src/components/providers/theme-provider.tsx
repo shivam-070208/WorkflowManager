@@ -8,8 +8,8 @@ export function ThemeProvider({
   return (
     <NextThemeProvider
       attribute="class"
-      themes={["light", "dark", "vintage", "system"]}
-      defaultTheme="system"
+      themes={["light", "dark", "vintage"]}
+      defaultTheme="dark"
       {...props}
     >
       {children}

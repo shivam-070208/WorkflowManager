@@ -16,6 +16,7 @@ import {
   OnConnect,
   OnDelete,
   Panel,
+  SelectionMode,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
@@ -87,7 +88,15 @@ const onDelete: OnDelete = useCallback((params)=>console.log(params),[]);
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onDelete={onDelete}
-        colorMode={resolvedTheme ? (resolvedTheme as "light" | "dark"| "system") :undefined}
+        proOptions={{
+          hideAttribution:true
+        }}
+        colorMode={resolvedTheme ? (resolvedTheme.toLowerCase() as "light" | "dark") :undefined}
+        snapGrid={[12,12]}
+        snapToGrid
+        panOnDrag={false}
+        panOnScroll
+        selectionOnDrag
       >
         <Background />
         <Controls />

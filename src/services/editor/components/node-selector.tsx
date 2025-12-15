@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { useReactFlow } from "@xyflow/react";
 
 import { generateSlug } from "random-word-slugs";
+import { toast } from "sonner";
 type NodeSelectorProps = React.ComponentPropsWithRef<"div"> & {
   isOpen: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -71,10 +72,20 @@ const NodeSelector = ({
     setOpen(false);
     const allNodes = getNodes()
     const isInitialNode = allNodes.find((node)=>node.type===NodeType.Initial)
+  if(type === NodeType.ManualTrigger){
+    const isHaveManualTrigger = allNodes.find((node)=>node.type===NodeType.ManualTrigger)
+    if(isHaveManualTrigger){
+     toast.error("Only one manual trigger node is allowed");
+     return;
+    }
+  }
     if(isInitialNode) deleteElements({nodes:[isInitialNode]});
+  
+    
     const centeX = window.innerWidth/2;
     const centeY = window.innerHeight/2;
     const position = screenToFlowPosition({x:centeX+Math.random()*60 ,y:centeY+Math.random()*60})
+
     addNodes({
       id:generateSlug(3),
       data:{
