@@ -15,7 +15,7 @@ const DialogLayout = ({
 }:Readonly<Props>) => {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-md">
+            <DialogContent >
             <DialogHeader>
                 {tittle && <DialogTitle>{tittle}</DialogTitle>}
                 {description && <DialogDescription>{description}</DialogDescription>}

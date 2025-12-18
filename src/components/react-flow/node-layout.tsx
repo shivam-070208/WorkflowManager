@@ -47,4 +47,13 @@ const WorkflowNode = ({
 )
 }
 
-export default WorkflowNode;
+const TriggerNode = ({left=false,className,...props}:Readonly<WorkflowNodeProps>) =>{
+    return (
+        <WorkflowNode className={cn("rounded-l-full",className)} left={left} {...props}/>
+    )
+}
+
+export {
+     WorkflowNode,
+     TriggerNode
+};

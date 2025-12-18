@@ -19,7 +19,7 @@ import {
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useReactFlow } from "@xyflow/react";
-import { NodeType } from "@/generated/prisma/enums";
+
 
 const EditorBreadCrumb = ({ workflowId }: { workflowId: string }) => {
   const { data: workflow } = useGetWorkflowById(workflowId);
@@ -103,6 +103,8 @@ const EditorSaveButton=({workflowId}:{workflowId:string})=>{
 }
 
 const EditorHeader = ({ workflowId }: { workflowId: string }) => {
+
+
   return (
     <div className="flex w-full  items-center justify-between  py-4 px-5">
       <div className="flex items-center gap-2">

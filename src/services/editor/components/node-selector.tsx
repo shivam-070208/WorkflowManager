@@ -1,54 +1,25 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import {motion} from "motion/react";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetHeader, SheetTrigger,SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { NodeType } from "@/generated/prisma/enums";
-import { Github, ClipboardList, MousePointerClick, Globe } from "lucide-react";
+
 import { Input } from "@/components/ui/input";
 import { useReactFlow } from "@xyflow/react";
 
 import { generateSlug } from "random-word-slugs";
 import { toast } from "sonner";
+import { Node, NodesOptions } from "@/config/nodes/node-selector-data";
 type NodeSelectorProps = React.ComponentPropsWithRef<"div"> & {
   isOpen: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-type Node={
-  icon:React.ReactNode;
-  title:string;
-  description:string;
-  type:NodeType;
-}
 
-const NodesOptions: Node[] = [
-  {
-    icon: <Github className="w-6 h-6" />,
-    title: "Github Hooks",
-    description: "Trigger workflows from Github events.",
-    type: NodeType.GithubHooks,
-  },
-  {
-    icon: <ClipboardList className="w-6 h-6" />,
-    title: "Google Form",
-    description: "Start workflow from Google Form submissions.",
-    type: NodeType.GoogleForm,
-  },
-  {
-    icon: <MousePointerClick className="w-6 h-6" />,
-    title: "Manual Trigger",
-    description: "Manually trigger your workflow.",
-    type: NodeType.ManualTrigger,
-  },
-  {
-    icon: <Globe className="w-6 h-6" />,
-    title: "Webhook",
-    description: "Trigger workflow from an incoming webhook.",
-    type: NodeType.Webhook,
-  },
-];
+
+
 
 
 const NodeSelector = ({
@@ -58,7 +29,6 @@ const NodeSelector = ({
   className,
   ...props
 }: NodeSelectorProps) => {
-
 
   const [hovered, setHovered] = useState<string | null>(null);
   const [search,setSearch] = useState<string>("");
@@ -106,7 +76,7 @@ const NodeSelector = ({
        <SheetDescription>Select a node here to add in workspace , some node may ask for input</SheetDescription>
       </SheetHeader>
       <div onMouseLeave={()=>setHovered(null)} className="flex flex-col gap-4 px-2">
-      <Input value={search} className="" onChange={(e)=>setSearch(e.target.value)} placeholder="Search"/>
+      <Input value={search} onChange={(e:ChangeEvent<HTMLInputElement>)=>setSearch(e.target.value)} placeholder="Search"/>
       <Separator />
           {filteredNodeOption.map((node) => (
             <motion.button
@@ -118,7 +88,7 @@ const NodeSelector = ({
               className="group active:scale-80  flex items-center gap-4 rounded-md p-3 hover:border-b  relative transition-all  "
               type="button"
             >
-              <span className="mt-1">{node.icon}</span>
+              <node.icon  />
               <span className="flex flex-col items-start text-left">
                 <span className="font-medium text-base">{node.title}</span>
                 <span className="text-xs text-muted-foreground">{node.description}</span>

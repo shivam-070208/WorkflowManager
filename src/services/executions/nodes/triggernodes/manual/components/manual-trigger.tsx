@@ -5,7 +5,7 @@ import {
     BaseNodeContent,
 } from "@/components/react-flow/base-node";
 import { MousePointerClick } from "lucide-react";
-import WorkflowNode from "@/components/react-flow/workflow-node";
+import {TriggerNode} from "@/components/react-flow/node-layout";
 import ManualTriggerDialog from "./dialog";
 
 
@@ -14,11 +14,11 @@ const ManualTriggerNode:React.FC = memo(() => {
     return(
         <>
         <ManualTriggerDialog open={dialogOpen} onOpenChange={setDialogOpen} />
-        <WorkflowNode onSettingClick={()=>setDialogOpen(true)} left={false} className="rounded-l-full">
+        <TriggerNode onSettingClick={()=>setDialogOpen(true)} left={false} >
         <BaseNodeContent className="w-auto h-auto flex  justify-center items-center">
         <MousePointerClick size={30} />
         </BaseNodeContent>
-        </WorkflowNode>
+        </TriggerNode>
         </>
     )
 })

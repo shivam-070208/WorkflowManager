@@ -1,5 +1,5 @@
 "use client";
-import React, {  useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {  useCallback, useEffect, useRef, useState } from "react";
 import {
   ReactFlowProvider,
   ReactFlow,
@@ -16,7 +16,6 @@ import {
   OnConnect,
   OnDelete,
   Panel,
-  SelectionMode,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
@@ -25,7 +24,7 @@ import { useGetWorkflowById } from "@/services/workflows/hooks/workflow";
 import { NodesTypes } from "@/config/nodes/node-types";
 import AddNode from "./add-node";
 import EditorHeader from "./editor-header";
-import { EmptyNode } from "@/config/nodes/data";
+import { EmptyNode, NodePosition } from "@/config/nodes/data";
 
 type EditorProps = {
   workflowId: string;
@@ -40,29 +39,35 @@ const Editor: React.FC<EditorProps> = ({ workflowId }) => (
 
 const Canvas: React.FC<EditorProps> = ({ workflowId }) => {
   const {  resolvedTheme } = useTheme(); 
-  const { data, isLoading } = useGetWorkflowById(workflowId);
+  const { data, isLoading,error } = useGetWorkflowById(workflowId);
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const CanvaRef = useRef<HTMLDivElement | null>(null);
-
  
+ const getCenteredPosition = ():NodePosition =>{
+  if(!CanvaRef?.current) return {x:0,y:0};
+  const Rect = CanvaRef.current.getBoundingClientRect();
+  return {
+    x: (window.innerWidth - Rect.left) / 2,
+    y: (window.innerHeight - Rect.top) / 2,
+  }
+ }
 
   useEffect(() => {
     if (!isLoading && data && CanvaRef && CanvaRef.current) {
       const updatedNodes:Node[] = [...data.nodes];
       if(updatedNodes.length === 0){
-       updatedNodes.push(EmptyNode)
+       updatedNodes.push(new EmptyNode({_position:getCenteredPosition()}))
      }
       if (updatedNodes.length === 1 && updatedNodes[0].type === "Initial") {
-        const Rect = CanvaRef.current.getBoundingClientRect();
-        updatedNodes[0].position = {
-          x: (window.innerWidth - Rect.left) / 2,
-          y: (window.innerHeight - Rect.top) / 2,
-        };
+       
+        updatedNodes[0].position = getCenteredPosition();
       } 
       setNodes(updatedNodes);
+      setEdges([...data.connections]);
+    } else if (error){
     }
-  }, [isLoading, data]);
+  }, [isLoading, data,error]);
   
   const onNodesChange:OnNodesChange = useCallback(
     (changes) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
@@ -76,7 +81,19 @@ const Canvas: React.FC<EditorProps> = ({ workflowId }) => {
     (params) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
     [],
   );
-const onDelete: OnDelete = useCallback((params)=>console.log(params),[]);
+const onDelete: OnDelete = useCallback((params)=>{
+  if(params.nodes){
+    setNodes((prevNodes) => {
+      const updatedNodes = prevNodes.filter(
+        (node) => !params.nodes?.some((deletedNode) => deletedNode.id === node.id)
+      );
+      if (updatedNodes.length === 0) {
+        updatedNodes.push(new EmptyNode({_position:getCenteredPosition()}))
+      }
+      return updatedNodes;
+    });
+  }
+},[]);
 
   return (
     <div ref={CanvaRef} className="h-full w-full">
@@ -91,7 +108,7 @@ const onDelete: OnDelete = useCallback((params)=>console.log(params),[]);
         proOptions={{
           hideAttribution:true
         }}
-        colorMode={resolvedTheme ? (resolvedTheme.toLowerCase() as "light" | "dark") :undefined}
+        colorMode={resolvedTheme ? (resolvedTheme.toLowerCase() as "light" | "dark") :"dark"}
         snapGrid={[12,12]}
         snapToGrid
         panOnDrag={false}
