@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { Button } from "../ui/button";
 
 interface ErrorViewProps {
   error: Error;
@@ -14,15 +15,16 @@ const ErrorView = ({ error, resetErrorBoundary }: ErrorViewProps) => {
       <pre className="text-red-500 whitespace-pre-wrap">
       {error?.message}
       </pre>
-      <button
+      <Button
         type="button"
+        variant="destructive"
+        className="w-fit"
         onClick={() => {
           resetErrorBoundary();
         }}
-        className="mt-2 px-0.5 py-1 bg-amber-400 text-white"
        >
         Try Again
-      </button>
+      </Button>
     </div>
   );
 };

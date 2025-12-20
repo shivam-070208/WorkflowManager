@@ -14,6 +14,8 @@ import {
 } from "../ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
+import { SubHeading } from "../ui/sub-heading";
+import { Heading } from "../ui/heading";
 
 interface EntityContextType {
   sortKey: string;
@@ -122,9 +124,9 @@ const EntityHeaderContent = ({
   subheading?: React.ReactNode;
 }) => (
   <div>
-    <div className="text-3xl font-semibold">{heading}</div>
+    <Heading as="h2">{heading}</Heading>
     {subheading && (
-      <div className="text-muted-foreground text-sm">{subheading}</div>
+      <SubHeading className="text-muted-foreground">{subheading}</SubHeading>
     )}
   </div>
 );

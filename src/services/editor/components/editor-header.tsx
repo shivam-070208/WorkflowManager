@@ -19,6 +19,7 @@ import {
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useReactFlow } from "@xyflow/react";
+import { NodeType } from "@/generated/prisma/enums";
 
 
 const EditorBreadCrumb = ({ workflowId }: { workflowId: string }) => {
@@ -78,7 +79,7 @@ const EditorSaveButton=({workflowId}:{workflowId:string})=>{
         position: typeof node.position === "object" && node.position !== null
           ? { x: (node.position as any).x ?? 0, y: (node.position as any).y ?? 0 }
           : { x: 0, y: 0 },
-        type: (node.type as "Initial" | "GithubHooks" | "GoogleForm" | "ManualTrigger" | "Webhook") ?? "ManualTrigger",
+        type: (node.type as NodeType),
         label: (node as any).label ?? "", 
       })),
       edges: getEdges().map(edge => ({

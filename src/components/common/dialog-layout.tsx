@@ -3,21 +3,21 @@ interface Props {
     children?: React.ReactNode,
     open:boolean,
     onOpenChange:(open:boolean)=>void,
-    tittle?:string,
+    title?:string,
     description?:string,
 }
 const DialogLayout = ({
     children,
     open,
     onOpenChange,
-    tittle,
+    title,
     description,
 }:Readonly<Props>) => {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent >
             <DialogHeader>
-                {tittle && <DialogTitle>{tittle}</DialogTitle>}
+                {title && <DialogTitle>{title}</DialogTitle>}
                 {description && <DialogDescription>{description}</DialogDescription>}
             </DialogHeader>
                 {children}

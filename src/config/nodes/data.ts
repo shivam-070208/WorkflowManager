@@ -11,7 +11,7 @@ interface ConstructorProps {
     _position?:NodePosition
 }
 export class EmptyNode implements Node {
-    type: NodeType = NodeType.Initial;
+    type: NodeType = NodeType.INITIAL;
     id: string;
     position:NodePosition;
     data: Record<string, any>;

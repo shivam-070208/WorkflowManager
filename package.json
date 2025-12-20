@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:trace": "cross-env NODE_OPTIONS=--trace-deprecation next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -56,6 +57,7 @@
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
     "baseline-browser-mapping": "^2.8.32",
+    "cross-env": "^7.0.3",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
     "prettier": "^3.7.2",

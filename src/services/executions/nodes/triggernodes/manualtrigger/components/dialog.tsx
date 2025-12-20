@@ -11,9 +11,7 @@ const ManualTriggerDialog = ({
 }:Readonly<DialogProps>) => {
 
     return (
-        <DialogLayout tittle="Manual Trigger" description="Settings of Manual trigger" open={open} onOpenChange={onOpenChange}>
-            <p>No Setting Required for Manual Trigger, It will execute  Manualy by clicking execute</p>
-        </DialogLayout>
+        <DialogLayout title="Manual Trigger" description="Settings of Manual Trigger" open={open} onOpenChange={onOpenChange}>            <p>No settings required for Manual Trigger. It will execute manually by clicking the execute button.</p>        </DialogLayout>
     )
 }
 

@@ -91,11 +91,12 @@ model Workflow {
 }
 
 enum NodeType {
-  Initial
-  GithubHooks
-  GoogleForm
-  ManualTrigger
-  Webhook
+  INITIAL
+  MANUALTRIGGER
+  GOOGLEFORM
+  WEBHOOK
+  HTTPREQUEST
+  AIAGENTS
 }
 
 model Node {

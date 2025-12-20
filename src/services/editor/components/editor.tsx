@@ -16,6 +16,7 @@ import {
   OnConnect,
   OnDelete,
   Panel,
+  useReactFlow,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
@@ -25,6 +26,8 @@ import { NodesTypes } from "@/config/nodes/node-types";
 import AddNode from "./add-node";
 import EditorHeader from "./editor-header";
 import { EmptyNode, NodePosition } from "@/config/nodes/data";
+import { NodeType } from "@/generated/prisma/enums";
+import ExecuteWorkflow from "./execute-workflow";
 
 type EditorProps = {
   workflowId: string;
@@ -43,31 +46,28 @@ const Canvas: React.FC<EditorProps> = ({ workflowId }) => {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const CanvaRef = useRef<HTMLDivElement | null>(null);
- 
- const getCenteredPosition = ():NodePosition =>{
-  if(!CanvaRef?.current) return {x:0,y:0};
-  const Rect = CanvaRef.current.getBoundingClientRect();
-  return {
-    x: (window.innerWidth - Rect.left) / 2,
-    y: (window.innerHeight - Rect.top) / 2,
-  }
- }
+ const {screenToFlowPosition} = useReactFlow()
+ const getCenteredPosition = useCallback(():NodePosition =>{ 
+
+  return screenToFlowPosition({
+    x:window.innerWidth/2,
+    y:window.innerHeight/2,
+  })
+ },[])
 
   useEffect(() => {
-    if (!isLoading && data && CanvaRef && CanvaRef.current) {
+    if (!isLoading && data ) {
       const updatedNodes:Node[] = [...data.nodes];
       if(updatedNodes.length === 0){
-       updatedNodes.push(new EmptyNode({_position:getCenteredPosition()}))
-     }
-      if (updatedNodes.length === 1 && updatedNodes[0].type === "Initial") {
-       
+        updatedNodes.push(new EmptyNode({_position:getCenteredPosition()}))
+      }
+      if (updatedNodes.length === 1 && updatedNodes[0].type === NodeType.INITIAL) {
         updatedNodes[0].position = getCenteredPosition();
       } 
       setNodes(updatedNodes);
       setEdges([...data.connections]);
-    } else if (error){
-    }
-  }, [isLoading, data,error]);
+    } 
+  }, [isLoading, data,getCenteredPosition]);
   
   const onNodesChange:OnNodesChange = useCallback(
     (changes) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
@@ -93,7 +93,7 @@ const onDelete: OnDelete = useCallback((params)=>{
       return updatedNodes;
     });
   }
-},[]);
+},[getCenteredPosition]);
 
   return (
     <div ref={CanvaRef} className="h-full w-full">
@@ -120,6 +120,9 @@ const onDelete: OnDelete = useCallback((params)=>{
         <MiniMap nodeStrokeWidth={3} />
         <Panel position="top-right">
           <AddNode />
+        </Panel>
+        <Panel position="bottom-center">
+          <ExecuteWorkflow />
         </Panel>
       </ReactFlow>
     </div>

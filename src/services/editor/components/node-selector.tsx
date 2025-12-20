@@ -5,22 +5,19 @@ import {motion} from "motion/react";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetHeader, SheetTrigger,SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { NodeType } from "@/generated/prisma/enums";
-
 import { Input } from "@/components/ui/input";
-import { useReactFlow } from "@xyflow/react";
-
+import { useReactFlow, useNodes } from "@xyflow/react";
 import { generateSlug } from "random-word-slugs";
 import { toast } from "sonner";
 import { Node, NodesOptions } from "@/config/nodes/node-selector-data";
-type NodeSelectorProps = React.ComponentPropsWithRef<"div"> & {
+import { filterBySearch, filterNodesByTypes } from "../utils/utils";
+import { TriggerNodeTypes, WorkflowNodeTypes } from "@/config/nodes/node-types";
+
+
+interface NodeSelectorProps extends React.ComponentPropsWithRef<"div"> {
   isOpen: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
-
-
-
-
-
 
 const NodeSelector = ({
   children,
@@ -32,25 +29,39 @@ const NodeSelector = ({
 
   const [hovered, setHovered] = useState<string | null>(null);
   const [search,setSearch] = useState<string>("");
-  const [filteredNodeOption,setFilteredNodeOptions] = useState<Node[]>(NodesOptions);
-  const {addNodes,deleteElements,getNodes,screenToFlowPosition} = useReactFlow()
-  useEffect(()=>{
-    const data = [...NodesOptions]
-    setFilteredNodeOptions(data.filter((node)=>node.title.toLowerCase().includes(search.toLowerCase())))
-  },[search])
+  const { addNodes, deleteElements, getNodes, screenToFlowPosition } = useReactFlow();
+  const nodes = useNodes();
+  const [isTrigger,setIsTrigger] = useState<boolean>(false)
+  const [filteredNodeOption, setFilteredNodeOptions] = useState<Node[]>(NodesOptions);
+
+  useEffect(() => {
+    const isInitialNodePresent = nodes.some((node) => node.type === NodeType.INITIAL);
+    const isTriggerNodePresent = nodes.some((node) => TriggerNodeTypes.includes(node.type as NodeType));
+    let nodeOptionsToShow: Node[];
+    if ((isInitialNodePresent || nodes.length === 0||!isTriggerNodePresent)) {
+      setIsTrigger(true);
+      nodeOptionsToShow = filterNodesByTypes([...NodesOptions], TriggerNodeTypes);
+    } else {
+      setIsTrigger(false);
+      nodeOptionsToShow = filterNodesByTypes([...NodesOptions], WorkflowNodeTypes);
+    }
+    nodeOptionsToShow = filterBySearch(nodeOptionsToShow, search);
+    setFilteredNodeOptions(nodeOptionsToShow);
+  }, [search, nodes]);
+
   const AddtoCanvas = (type:NodeType)=>{
     setOpen(false);
-    const allNodes = getNodes()
-    const isInitialNode = allNodes.find((node)=>node.type===NodeType.Initial)
-  if(type === NodeType.ManualTrigger){
-    const isHaveManualTrigger = allNodes.find((node)=>node.type===NodeType.ManualTrigger)
-    if(isHaveManualTrigger){
-     toast.error("Only one manual trigger node is allowed");
-     return;
+    const allNodes = getNodes(); 
+
+    if (
+      TriggerNodeTypes.includes(type) &&
+      allNodes.some((node: any) => TriggerNodeTypes.includes(node.type))
+    ) {
+      toast.error("There is only one trigger Node Allowed");
+      return;
     }
-  }
+     const isInitialNode = allNodes.find((node)=>node.type===NodeType.INITIAL)
     if(isInitialNode) deleteElements({nodes:[isInitialNode]});
-  
     
     const centeX = window.innerWidth/2;
     const centeY = window.innerHeight/2;
@@ -72,8 +83,14 @@ const NodeSelector = ({
           </div></SheetTrigger>
        <SheetContent >
       <SheetHeader className="flex  justify-between">
-       <SheetTitle>Select Node Type</SheetTitle>
-       <SheetDescription>Select a node here to add in workspace , some node may ask for input</SheetDescription>
+       <SheetTitle>
+         {isTrigger ? "Select Trigger Node" : "Select Workflow Node"}
+       </SheetTitle>
+       <SheetDescription>
+         {isTrigger
+           ? "Select a Node which will trigger your workflow"
+           : "Select a node here to add in workspace. Some nodes may ask for input."}
+       </SheetDescription>
       </SheetHeader>
       <div onMouseLeave={()=>setHovered(null)} className="flex flex-col gap-4 px-2">
       <Input value={search} onChange={(e:ChangeEvent<HTMLInputElement>)=>setSearch(e.target.value)} placeholder="Search"/>
