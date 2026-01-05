@@ -13,7 +13,7 @@ import React, { useState } from "react";
 import {
   useCreateWorkflows,
   useWorkflows,
-} from "@/services/workflows/hooks/workflow";
+} from "@/services/workflows/hooks/use-workflow";
 
 import Link from "next/link";
 import { toast } from "sonner";

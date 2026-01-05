@@ -1,0 +1,3 @@
+echo "🏃‍♂️ running build"
+npm run build
+echo "✅ completed build"

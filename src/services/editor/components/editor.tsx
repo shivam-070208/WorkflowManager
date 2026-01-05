@@ -21,7 +21,7 @@ import {
 
 import "@xyflow/react/dist/style.css";
 import { useTheme } from "next-themes";
-import { useGetWorkflowById } from "@/services/workflows/hooks/workflow";
+import { useGetWorkflowById } from "@/services/workflows/hooks/use-workflow";
 import { NodesTypes } from "@/config/nodes/node-types";
 import AddNode from "./add-node";
 import EditorHeader from "./editor-header";
@@ -47,14 +47,14 @@ const Canvas: React.FC<EditorProps> = ({ workflowId }) => {
   const [edges, setEdges] = useState<Edge[]>([]);
   const CanvaRef = useRef<HTMLDivElement | null>(null);
  const {screenToFlowPosition} = useReactFlow()
+ 
  const getCenteredPosition = useCallback(():NodePosition =>{ 
 
   return screenToFlowPosition({
     x:window.innerWidth/2,
     y:window.innerHeight/2,
   })
- },[])
-
+ },[screenToFlowPosition])
   useEffect(() => {
     if (!isLoading && data ) {
       const updatedNodes:Node[] = [...data.nodes];
@@ -122,7 +122,7 @@ const onDelete: OnDelete = useCallback((params)=>{
           <AddNode />
         </Panel>
         <Panel position="bottom-center">
-          <ExecuteWorkflow />
+          <ExecuteWorkflow workflowId={workflowId} />
         </Panel>
       </ReactFlow>
     </div>

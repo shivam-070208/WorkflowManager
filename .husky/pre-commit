@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "🏃‍♂️ running linting and formatting"
+npx lint-staged
+echo "✅ completed linting and formatting"

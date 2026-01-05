@@ -15,7 +15,7 @@ import {
   useGetWorkflowById,
   useUpdateWorkflow,
   useUpdateWorkflowName,
-} from "@/services/workflows/hooks/workflow";
+} from "@/services/workflows/hooks/use-workflow";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useReactFlow } from "@xyflow/react";
@@ -35,7 +35,7 @@ const EditorBreadCrumb = ({ workflowId }: { workflowId: string }) => {
       updateWorkflowName.mutate(
         { id: workflow.id, name: newName },
         {
-          onError: (e) => {
+          onError: () => {
             toast("Something went wrong");
           },
           onSuccess: () => {
@@ -77,15 +77,15 @@ const EditorSaveButton=({workflowId}:{workflowId:string})=>{
         id: node.id,
         data: node.data,
         position: typeof node.position === "object" && node.position !== null
-          ? { x: (node.position as any).x ?? 0, y: (node.position as any).y ?? 0 }
+          ? { x: node.position.x ?? 0, y: node.position.y ?? 0 }
           : { x: 0, y: 0 },
         type: (node.type as NodeType),
-        label: (node as any).label ?? "", 
+        label: "", 
       })),
       edges: getEdges().map(edge => ({
         source: edge.source,
         target: edge.target,
-        label: typeof edge.label === "string" ? edge.label : undefined,
+        label:"",
       })),
     }, {
       onSuccess: () => {

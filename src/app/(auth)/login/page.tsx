@@ -1,14 +1,15 @@
 import LoginForm from "@/services/auth/components/Login";
 import { unauthRequire } from "@/lib/auth-utils";
 import React from "react";
+import Container from "@/components/common/container";
 
 async function page() {
-  // await unauthRequire();
+  await unauthRequire();
 
   return (
-    <div className="grid min-h-dvh place-items-center p-3">
+    <Container>
       <LoginForm />
-    </div>
+    </Container>
   );
 }
 

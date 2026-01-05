@@ -1,7 +1,7 @@
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 
-export const useWorkflows = (params: any) => {
+export const useWorkflows = (params: Record<string, unknown>) => {
   const trpc = useTRPC();
   return useSuspenseQuery(trpc.workflow.getAll.queryOptions(params));
 };

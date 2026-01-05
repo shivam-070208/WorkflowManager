@@ -70,13 +70,11 @@ export default function LoginForm() {
       {
         onSuccess: () => {
           toast.dismiss(toastId);
-          toast.success("Logged in successfully redirecting");
+          toast.info("Logged in successfully redirecting");
         },
         onError: (err: ErrorContext) => {
           toast.dismiss(toastId);
-
-          // Try to get a meaningful error message
-          let errorMessage = err.error.message || "something went wrong";
+          const errorMessage = err.error.message || "something went wrong";
           toast.error(errorMessage);
         },
       },
@@ -120,7 +118,7 @@ export default function LoginForm() {
             toast.dismiss(toastId);
 
             // Try to get a meaningful error message
-            let errorMessage = err.error.message || "something went wrong";
+            const errorMessage = err.error.message || "something went wrong";
             toast.error(errorMessage);
           },
         },

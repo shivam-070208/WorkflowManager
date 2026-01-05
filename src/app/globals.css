@@ -248,7 +248,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-sans w-dvw ;
+    @apply bg-background text-foreground max-w-dvw font-sans;
   }
   button {
     @apply cursor-pointer;
