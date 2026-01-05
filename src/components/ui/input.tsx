@@ -41,7 +41,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         className="group/input rounded-lg p-[2px] transition duration-300"
       >
         {type === "textarea" ? (
-          <TextArea />
+          <TextArea className={className} ref={ref} {...props} />
         ) : (
           <input
             type={type}
