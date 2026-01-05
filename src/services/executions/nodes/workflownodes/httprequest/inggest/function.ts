@@ -19,22 +19,21 @@ export const HttpRequestExecutor:NodeExecutor<HttpRequestNodeDataTypes> =  async
       throw new NonRetriableError("Variable is required to run httpRequestNode");
     }
    const response = await step.run(`making a ${method} request to ${endpoint}`, async () => {
-
-     let response;
-    if(["POST","PUT","PATCH"].includes(method)){
-    response = await axios({
+     if(["POST","PUT","PATCH"].includes(method)){
+    return await axios({
       method: method.toLowerCase(),
       url: endpoint,
       data: body,
       headers: (headers ? Object.assign({}, ...headers) : {}),
-     params:params||{},allowAbsoluteUrls:true});
+     params:params||{}});
     }
     else if(["GET","DELETE"].includes(method)){
-      response = await axios({method:method.toLowerCase(),url:endpoint,  headers: (headers ? Object.assign({}, ...headers) : {}),
-        params:params||{},allowAbsoluteUrls:true});
+      return await axios({method:method.toLowerCase(),url:endpoint,  headers: (headers ? Object.assign({}, ...headers) : {}),
+        params:params||{}});
     }
-    return  response;
-    
+    else {
+      throw new NonRetriableError(`Unsupported HTTP method: ${method}`);
+    }
     });
 
     return {
