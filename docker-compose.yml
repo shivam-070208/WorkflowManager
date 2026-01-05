@@ -16,8 +16,10 @@ services:
     container_name: postgres_db
     restart: always
     environment:
-      POSTGRES_USER: ${{ secrets.DATABASE_USER }}
-      POSTGRES_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+     environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+       POSTGRES_DB: appdb
       POSTGRES_DB: appdb
     volumes:
       - postgres_data:/var/lib/postgresql/data
