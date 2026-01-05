@@ -27,69 +27,69 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
 import { ErrorContext } from "better-auth/client";
-const signupformValues = z
+
+const signupFormValues = z
   .object({
     name: z.string().min(1, "Name is required"),
-    email: z.email("Please enter a correct maill address"),
+    email: z.string().email("Please enter a correct mail address"),
     password: z
       .string()
       .min(1, "Password is required")
       .regex(
         /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-        "Password must have at least one lowercase letter, one uppercase letter, one number, and one special character.",
+        "Password must have at least one lowercase letter, one uppercase letter, one number, and one special character."
       ),
     confirmPassword: z
       .string()
       .min(1, "Confirm Password is required")
       .regex(
         /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-        "Password must have at least one lowercase letter, one uppercase letter, one number, and one special character.",
+        "Password must have at least one lowercase letter, one uppercase letter, one number, and one special character."
       ),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
-    path: ["confirmPassword", "password"],
+    path: ["confirmPassword"],
   });
-type SignupFormValues = z.infer<typeof signupformValues>;
+
+type SignupFormValues = z.infer<typeof signupFormValues>;
+
 export default function RegisterForm() {
   const router = useRouter();
   const signupFormInputs = {
     name: {
-      required: "please enter your email",
       type: "text",
       pattern: null,
       placeholder: "Enter your Name",
     },
     email: {
-      required: "please enter your email",
       type: "email",
       pattern: null,
       placeholder: "Enter your Email",
     },
     password: {
-      required: "please enter your password",
       type: "password",
       placeholder: "********",
     },
     confirmPassword: {
-      required: "please confirm your password",
       type: "password",
       placeholder: "********",
     },
   };
 
-  const form = useForm<SignupFormValues>({
+  const Form = useForm<SignupFormValues>({
     defaultValues: {
       name: "",
       email: "",
       password: "",
       confirmPassword: "",
     },
-    resolver: zodResolver(signupformValues),
+    resolver: zodResolver(signupFormValues),
   });
+
   const handleGithubAuth = async (mode: "login" | "signup") => {
     const toastId = toast.loading(
-      mode === "signup" ? "Signing up with Github" : "Logging in with Github",
+      mode === "signup" ? "Signing up with Github" : "Logging in with Github"
     );
     try {
       await authClient.signIn.social({
@@ -102,14 +102,15 @@ export default function RegisterForm() {
           },
         },
       });
-    } catch (err) {
+    } catch (_err) {
       toast.dismiss(toastId);
       toast.error("Authentication failed.");
     }
   };
+
   const handleGoogleAuth = async (mode: "login" | "signup") => {
     const toastId = toast.loading(
-      mode === "signup" ? "Signing up with Github" : "Logging in with google",
+      mode === "signup" ? "Signing up with Google" : "Logging in with Google"
     );
     try {
       await authClient.signIn.social({
@@ -122,11 +123,12 @@ export default function RegisterForm() {
           },
         },
       });
-    } catch (err) {
+    } catch (_err) {
       toast.dismiss(toastId);
       toast.error("Authentication failed.");
     }
   };
+
   const onSubmit = async (data: SignupFormValues) => {
     const toastId = toast.loading("Creating Account");
     try {
@@ -145,28 +147,30 @@ export default function RegisterForm() {
           },
           onError: (err: ErrorContext) => {
             toast.dismiss(toastId);
-
-            // Try to get a meaningful error message
-            let errorMessage = err.error.message || "something went wrong";
+            const errorMessage = err.error.message || "something went wrong";
             toast.error(errorMessage);
           },
-        },
+        }
       );
-    } catch (err) {
+    } catch (err: unknown) {
       toast.dismiss(toastId);
       console.error("Registration error:", err);
       let errorMessage = "Something went wrong";
-      if (err instanceof Error) {
-        errorMessage = (err as Error).message;
-      } else if (err && typeof err === "object" && "message" in err) {
-        errorMessage = String((err as any).message) || errorMessage;
-      } else if (err) {
-        errorMessage = String(err);
+      if (
+        err &&
+        typeof err === "object" &&
+        "message" in err &&
+        typeof (err as { message?: unknown }).message === "string"
+      ) {
+        errorMessage = (err as { message: string }).message;
       }
+       
       toast.error(errorMessage);
     }
   };
-  const isPending = form.formState.isSubmitting;
+
+  const isPending = Form.formState.isSubmitting;
+
   return (
     <Card className="mx-auto w-full max-w-md">
       <CardHeader className="text-center">
@@ -181,22 +185,19 @@ export default function RegisterForm() {
         <CardDescription>Create your account to continue</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="mt-2 space-y-8">
+        <form onSubmit={Form.handleSubmit(onSubmit)} className="mt-2 space-y-8">
           {Object.entries(signupFormInputs).map(([key, value]) => (
             <LabelInputContainer key={key}>
               <Label>{key.toLocaleUpperCase()}</Label>
               <Error
                 enabled={
-                  !!form.formState.errors[key as keyof typeof signupFormInputs]
+                  !!Form.formState.errors[key as keyof SignupFormValues]
                 }
               >
-                {
-                  form.formState.errors[key as keyof typeof signupFormInputs]
-                    ?.message
-                }
+                {Form.formState.errors[key as keyof SignupFormValues]?.message}
               </Error>
               <Input
-                {...form.register(key as "email" | "password")}
+                {...Form.register(key as keyof SignupFormValues)}
                 type={value.type}
                 autoComplete={key}
                 placeholder={value.placeholder}

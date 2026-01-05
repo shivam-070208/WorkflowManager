@@ -15,7 +15,7 @@ export const workflowRouter = createTRPCRouter({
           create: [
             {
               name: generateSlug(3),
-              type: "Initial",
+              type: "INITIAL",
               position: {
                 x: 100,
                 y: 100,
@@ -113,7 +113,7 @@ export const workflowRouter = createTRPCRouter({
     })).mutation(async ({input,ctx})=>{
       const {id,nodes,edges} = input;
       await prisma.$transaction(async (tx)=>{
-        await prisma.workflow.findFirstOrThrow({
+        await tx.workflow.findFirstOrThrow({
            where:{
              id:id,
              userId:ctx.auth.user.id

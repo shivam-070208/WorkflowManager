@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Laptop2, Camera } from "lucide-react";
+import { Sun, Moon,  Camera } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,22 +24,15 @@ const themeOptions = [
     icon: <Moon className="h-4 w-4 text-blue-900 dark:text-blue-300" />,
   },
   {
-    value: "system",
-    label: "System",
-    icon: <Laptop2 className="text-muted-foreground h-4 w-4" />,
-  },
-  {
     value: "vintage",
     label: "Vintage",
     icon: <Camera className="h-4 w-4 text-amber-700 dark:text-amber-400" />,
   },
 ];
-const themeIcon = (theme: string = "system") => {
-  const option =
-    themeOptions.find((opt) => opt.value === theme) ??
-    themeOptions.find((opt) => opt.value === "system");
-  return React.cloneElement(option!.icon, {
-    className: " " + (option!.icon.props.className ?? ""),
+const themeIcon = (theme: string = "system"):React.ReactElement|null => {
+  const option =themeOptions.find((opt) => opt.value === theme)|| themeOptions[1];
+  return React.cloneElement(option.icon, {
+    className: " " + (option.icon.props.className ?? ""),
   });
 };
 

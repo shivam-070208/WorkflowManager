@@ -1,54 +1,23 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import {motion} from "motion/react";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetHeader, SheetTrigger,SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { NodeType } from "@/generated/prisma/enums";
-import { Github, ClipboardList, MousePointerClick, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useReactFlow } from "@xyflow/react";
-
+import { useReactFlow, useNodes } from "@xyflow/react";
 import { generateSlug } from "random-word-slugs";
-type NodeSelectorProps = React.ComponentPropsWithRef<"div"> & {
+import { toast } from "sonner";
+import { Node, NodesOptions } from "@/config/nodes/node-selector-data";
+import { filterBySearch, filterNodesByTypes } from "../utils/utils";
+import { TriggerNodeTypes, WorkflowNodeTypes } from "@/config/nodes/node-types";
+
+
+interface NodeSelectorProps extends React.ComponentPropsWithRef<"div"> {
   isOpen: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
-
-type Node={
-  icon:React.ReactNode;
-  title:string;
-  description:string;
-  type:NodeType;
-}
-
-const NodesOptions: Node[] = [
-  {
-    icon: <Github className="w-6 h-6" />,
-    title: "Github Hooks",
-    description: "Trigger workflows from Github events.",
-    type: NodeType.GithubHooks,
-  },
-  {
-    icon: <ClipboardList className="w-6 h-6" />,
-    title: "Google Form",
-    description: "Start workflow from Google Form submissions.",
-    type: NodeType.GoogleForm,
-  },
-  {
-    icon: <MousePointerClick className="w-6 h-6" />,
-    title: "Manual Trigger",
-    description: "Manually trigger your workflow.",
-    type: NodeType.ManualTrigger,
-  },
-  {
-    icon: <Globe className="w-6 h-6" />,
-    title: "Webhook",
-    description: "Trigger workflow from an incoming webhook.",
-    type: NodeType.Webhook,
-  },
-];
-
 
 const NodeSelector = ({
   children,
@@ -58,23 +27,46 @@ const NodeSelector = ({
   ...props
 }: NodeSelectorProps) => {
 
-
   const [hovered, setHovered] = useState<string | null>(null);
   const [search,setSearch] = useState<string>("");
-  const [filteredNodeOption,setFilteredNodeOptions] = useState<Node[]>(NodesOptions);
-  const {addNodes,deleteElements,getNodes,screenToFlowPosition} = useReactFlow()
-  useEffect(()=>{
-    const data = [...NodesOptions]
-    setFilteredNodeOptions(data.filter((node)=>node.title.toLowerCase().includes(search.toLowerCase())))
-  },[search])
+  const { addNodes, deleteElements, getNodes, screenToFlowPosition } = useReactFlow();
+  const nodes = useNodes();
+  const [isTrigger,setIsTrigger] = useState<boolean>(false)
+  const [filteredNodeOption, setFilteredNodeOptions] = useState<Node[]>(NodesOptions);
+
+  useEffect(() => {
+    const isInitialNodePresent = nodes.some((node) => node.type === NodeType.INITIAL);
+    const isTriggerNodePresent = nodes.some((node) => TriggerNodeTypes.includes(node.type as NodeType));
+    let nodeOptionsToShow: Node[];
+    if ((isInitialNodePresent || nodes.length === 0||!isTriggerNodePresent)) {
+      setIsTrigger(true);
+      nodeOptionsToShow = filterNodesByTypes([...NodesOptions], TriggerNodeTypes);
+    } else {
+      setIsTrigger(false);
+      nodeOptionsToShow = filterNodesByTypes([...NodesOptions], WorkflowNodeTypes);
+    }
+    nodeOptionsToShow = filterBySearch(nodeOptionsToShow, search);
+    setFilteredNodeOptions(nodeOptionsToShow);
+  }, [search, nodes]);
+
   const AddtoCanvas = (type:NodeType)=>{
     setOpen(false);
-    const allNodes = getNodes()
-    const isInitialNode = allNodes.find((node)=>node.type===NodeType.Initial)
+    const allNodes = getNodes(); 
+
+    if (
+      TriggerNodeTypes.includes(type) &&
+      allNodes.some((node: any) => TriggerNodeTypes.includes(node.type))
+    ) {
+      toast.error("There is only one trigger Node Allowed");
+      return;
+    }
+     const isInitialNode = allNodes.find((node)=>node.type===NodeType.INITIAL)
     if(isInitialNode) deleteElements({nodes:[isInitialNode]});
+    
     const centeX = window.innerWidth/2;
     const centeY = window.innerHeight/2;
     const position = screenToFlowPosition({x:centeX+Math.random()*60 ,y:centeY+Math.random()*60})
+
     addNodes({
       id:generateSlug(3),
       data:{
@@ -86,14 +78,22 @@ const NodeSelector = ({
   }
   return (
     <Sheet open={isOpen} onOpenChange={(open)=>setOpen(open)} {...props}>
-        <SheetTrigger asChild className={className}>{children}</SheetTrigger>
+        <SheetTrigger asChild className={className}>
+         <div> {children}
+          </div></SheetTrigger>
        <SheetContent >
       <SheetHeader className="flex  justify-between">
-       <SheetTitle>Select Node Type</SheetTitle>
-       <SheetDescription>Select a node here to add in workspace , some node may ask for input</SheetDescription>
+       <SheetTitle>
+         {isTrigger ? "Select Trigger Node" : "Select Workflow Node"}
+       </SheetTitle>
+       <SheetDescription>
+         {isTrigger
+           ? "Select a Node which will trigger your workflow"
+           : "Select a node here to add in workspace. Some nodes may ask for input."}
+       </SheetDescription>
       </SheetHeader>
       <div onMouseLeave={()=>setHovered(null)} className="flex flex-col gap-4 px-2">
-      <Input value={search} className="" onChange={(e)=>setSearch(e.target.value)} placeholder="Search"/>
+      <Input value={search} onChange={(e:ChangeEvent<HTMLInputElement>)=>setSearch(e.target.value)} placeholder="Search"/>
       <Separator />
           {filteredNodeOption.map((node) => (
             <motion.button
@@ -105,7 +105,7 @@ const NodeSelector = ({
               className="group active:scale-80  flex items-center gap-4 rounded-md p-3 hover:border-b  relative transition-all  "
               type="button"
             >
-              <span className="mt-1">{node.icon}</span>
+              <node.icon  />
               <span className="flex flex-col items-start text-left">
                 <span className="font-medium text-base">{node.title}</span>
                 <span className="text-xs text-muted-foreground">{node.description}</span>

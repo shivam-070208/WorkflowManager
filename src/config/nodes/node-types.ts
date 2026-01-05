@@ -1,7 +1,20 @@
 import PlaceholderNode from "@/components/react-flow/placeholder-node";
 import { NodeType } from "@/generated/prisma/enums";
-import { ManualTriggerNode} from "@/services/executions/nodes"
-export const NodesTypes = {
-    [NodeType.Initial]:PlaceholderNode,
-    [NodeType.ManualTrigger]:ManualTriggerNode
-}
+import { HttpRequestNode, ManualTriggerNode, WebHookNode } from "@/services/executions/nodes";
+
+
+export const NodesTypes: Partial<Record<NodeType, React.FC>> = {
+    [NodeType.INITIAL]: PlaceholderNode,
+    [NodeType.MANUALTRIGGER]: ManualTriggerNode,
+    [NodeType.WEBHOOK]: WebHookNode,
+    [NodeType.HTTPREQUEST]:HttpRequestNode
+};
+
+export const TriggerNodeTypes: NodeType[] = [
+    NodeType.MANUALTRIGGER,
+    NodeType.WEBHOOK,
+];
+export const WorkflowNodeTypes: NodeType[] = [
+    NodeType.GOOGLEFORM,
+    NodeType.HTTPREQUEST,
+];

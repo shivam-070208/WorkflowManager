@@ -226,9 +226,8 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
-  --font-serif: var(--font-serif);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -249,7 +248,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground w-dvw ;
+    @apply bg-background text-foreground max-w-dvw font-sans;
   }
   button {
     @apply cursor-pointer;
