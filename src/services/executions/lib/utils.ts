@@ -36,6 +36,14 @@ export const sortWorkflow = <T extends NodeWithId, K extends Connection>(
                 }
             }
         });
+
+
+    }
+
+
+    const hasCycle = Object.values(inDegree).some(count => count > 0);
+    if (hasCycle) {
+        throw new Error("Workflow contains a cyclic dependency between nodes.");
     }
 
     return sorted;

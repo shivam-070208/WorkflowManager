@@ -5,4 +5,4 @@ export type NodeExecutor<T> = (args: {
     data: T;
     context: Record<string, unknown>;
     step: StepTool;
-}) => Promise<unknown>;
+}) => Promise<Record<string,unknown>>;

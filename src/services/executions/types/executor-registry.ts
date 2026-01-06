@@ -6,6 +6,7 @@ type ExecutionRegistryType = {
     [K in keyof NodeDataMap]: NodeExecutor<NodeDataMap[K]>;
   };
   
-export const ExecutionRegistry: Partial<ExecutionRegistryType> = {
-    [NodeType.HTTPREQUEST]: HttpRequestExecutor
+export const ExecutionRegistry = {
+    [NodeType.HTTPREQUEST]: HttpRequestExecutor,
+    [NodeType.MANUALTRIGGER]:()=>({})
 };
