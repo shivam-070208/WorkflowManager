@@ -1,8 +1,9 @@
-version: "3.9"
-
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        DATABASE_URL: ${DATABASE_URL}
     container_name: next_app
     ports:
       - "3000:3000"
@@ -10,25 +11,16 @@ services:
       - .env
     depends_on:
       - postgres
-      - inngest
+
   postgres:
     image: postgres:16
     container_name: postgres_db
     restart: always
     environment:
-     environment:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-       POSTGRES_DB: appdb
       POSTGRES_DB: appdb
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
-  inngest:
-    image: inngest/inngest
-    container_name: inngest
-    ports:
-      - "8288:8288"
-
 volumes:
   postgres_data:

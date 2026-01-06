@@ -1,5 +1,8 @@
 import { inngest } from "@/inngest/client";
 import { NonRetriableError } from "inngest";
+import { sortWorkflow } from "../lib/utils";
+import { Node } from "@/generated/prisma/client";
+import { ExecutionRegistry } from "../types/executor-registry";
 
  const ExecuteWorkflow = inngest.createFunction({
     id:"execute-workflow"
@@ -28,9 +31,7 @@ async ({
     })
 
 
-    const sortedNodes = await step.run("Sorting Nodes",async ()=>{
-        return data?.nodes;
-    })
+    const sortedNodes = await step.run("Sorting Nodes", ()=>sortWorkflow(data.nodes,data.connections));
 
     
 return {
