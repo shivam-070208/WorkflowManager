@@ -1,5 +1,9 @@
 import { inngest } from "@/inngest/client";
 import { NonRetriableError } from "inngest";
+import { sortWorkflow } from "../lib/utils";
+import { Node } from "@/generated/prisma/client";
+import { ExecutionRegistry } from "../types/executor-registry";
+import { NodeDataMap } from "../types/node-data-map";
 
  const ExecuteWorkflow = inngest.createFunction({
     id:"execute-workflow"
@@ -28,9 +32,27 @@ async ({
     })
 
 
-    const sortedNodes = await step.run("Sorting Nodes",async ()=>{
-        return data?.nodes;
-    })
+    const sortedNodes = await step.run("Sorting Nodes", ()=>{try {
+       return sortWorkflow(data.nodes,data.connections);
+    } catch (error:unknown) {
+        if (error instanceof Error) {
+            throw new NonRetriableError(error.message);
+        } else {
+            throw new NonRetriableError("Unknown error occurred while sorting workflow nodes");
+        }
+    }});
+    let context:Record<string,unknown> = {};
+    for (const node of sortedNodes) {
+        const executor = ExecutionRegistry[node.type as keyof typeof ExecutionRegistry];
+            if (!executor) {
+                throw new NonRetriableError(`No executor found for node type: ${node.type}`);
+            }
+            context = await executor({
+                data: node.data as NodeDataMap[typeof node.type & keyof NodeDataMap],
+                context: context,
+                step,
+            });
+    }
 
     
 return {
