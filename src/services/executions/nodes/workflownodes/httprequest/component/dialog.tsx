@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input, LabelInputContainer } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DialogProps } from "@/types/execution/nodes/props";
+import { DialogProps } from "@/services/executions/types/dialog-props";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNodeId, useReactFlow } from "@xyflow/react";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -105,7 +105,7 @@ const HttpRequestDialog = (
         }
     }
 
-    const handleSubmit = (data:HttpRequestNodeDataTypes) => {
+    const handleSubmit = (data: Omit<HttpRequestNodeDataTypes, "workflowId">) => {
         if (!nodeId) return;
         updateNodeData(nodeId, { ...data });
         toast.success("Data Updated for HttpRequest, click save ");

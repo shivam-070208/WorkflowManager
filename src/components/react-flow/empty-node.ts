@@ -14,7 +14,7 @@ export class EmptyNode implements Node {
     type: NodeType = NodeType.INITIAL;
     id: string;
     position:NodePosition;
-    data: Record<string, any>;
+    data: Record<string, unknown>;
 
     constructor({_id ,_position}:ConstructorProps) {
         this.id = _id || "0";

@@ -40,9 +40,13 @@ const WorkflowNode = ({
         onSettingClick?.();
     }
     return (
-        <div onPointerLeave={() => setActive(false)} className={cn("p-3 flex flex-col gap-2  group transition-all", active && "bg-background/50 border rounded ")}>
+        <div onPointerLeave={() => setActive(false)} className={cn(
+            "p-3 flex flex-col gap-2",
+             active && "bg-background/50 border rounded "
+             )}>
             {showtoolBar && 
-            <div className={cn("flex items-center justify-center gap-3 transition-all ", !active && "scale-0")}>
+            <div className={cn("flex items-center justify-center gap-3 ",
+            "pointer-events-auto transition-all", !active && "scale-0")}>
                 <button onClick={onDelete} aria-label="Delete node" className="p-1 hover:bg-accent rounded transition-colors">
                     <IconTrash className="text-red-500" />
                 </button>

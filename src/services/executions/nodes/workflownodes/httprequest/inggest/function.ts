@@ -1,6 +1,6 @@
 import {  NonRetriableError } from "inngest";
 import axios from "axios"
-import { NodeExecutor } from "@/services/executions/nodes/types/executor-types";
+import { NodeExecutor } from "@/services/executions/types/executor-types";
 
 export const HttpRequestExecutor:NodeExecutor<HttpRequestNodeDataTypes> =  async({
     data,

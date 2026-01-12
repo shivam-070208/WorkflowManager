@@ -1,5 +1,5 @@
 import { NodeType } from "@/generated/prisma/enums";
-import { NodeExecutor } from "@/services/executions/nodes/types/executor-types";
+import { NodeExecutor } from "@/services/executions/types/executor-types";
 import { HttpRequestExecutor } from "@/services/executions/nodes/workflownodes/httprequest/inggest/function";
 import { NodeDataMap } from "./node-data-map"
 type ExecutionRegistryType = {

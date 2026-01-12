@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useMemo, useState } from "react";
 import {motion} from "motion/react";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetHeader, SheetTrigger,SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
@@ -9,9 +9,10 @@ import { Input } from "@/components/ui/input";
 import { useReactFlow, useNodes } from "@xyflow/react";
 import { generateSlug } from "random-word-slugs";
 import { toast } from "sonner";
+import type {Node as ReactFlowNode} from "@xyflow/react"
 import { Node, NodesOptions } from "@/config/nodes/node-selector-data";
 import { filterBySearch, filterNodesByTypes } from "../utils/utils";
-import { TriggerNodeTypes, WorkflowNodeTypes } from "@/config/nodes/node-types";
+import { TriggerNodeTypes, WorkflowNodeTypes } from "@/services/executions/types/node-types";
 
 
 interface NodeSelectorProps extends React.ComponentPropsWithRef<"div"> {
@@ -33,7 +34,10 @@ const NodeSelector = ({
   const nodes = useNodes();
   const [isTrigger,setIsTrigger] = useState<boolean>(false)
   const [filteredNodeOption, setFilteredNodeOptions] = useState<Node[]>(NodesOptions);
-
+  const [randomOffset] = useState(() => ({
+    x: Math.random() * 60,
+    y: Math.random() * 60
+  }));
   useEffect(() => {
     const isInitialNodePresent = nodes.some((node) => node.type === NodeType.INITIAL);
     const isTriggerNodePresent = nodes.some((node) => TriggerNodeTypes.includes(node.type as NodeType));
@@ -55,7 +59,7 @@ const NodeSelector = ({
 
     if (
       TriggerNodeTypes.includes(type) &&
-      allNodes.some((node: any) => TriggerNodeTypes.includes(node.type))
+      allNodes.some((node:ReactFlowNode) => TriggerNodeTypes.includes(node.type as NodeType))
     ) {
       toast.error("There is only one trigger Node Allowed");
       return;
@@ -65,7 +69,8 @@ const NodeSelector = ({
     
     const centeX = window.innerWidth/2;
     const centeY = window.innerHeight/2;
-    const position = screenToFlowPosition({x:centeX+Math.random()*60 ,y:centeY+Math.random()*60})
+
+    const position = screenToFlowPosition({ x: centeX + randomOffset.x, y: centeY + randomOffset.y });
 
     addNodes({
       id:generateSlug(3),

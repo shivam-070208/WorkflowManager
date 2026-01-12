@@ -8,4 +8,5 @@ type HttpRequestNodeDataTypes = {
     variable: string;
     headers?:  (Record<string,string>)[];
     body?: string;
+    workflowId: string;
   };

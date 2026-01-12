@@ -4,11 +4,12 @@ import { sortWorkflow } from "../lib/utils";
 import { Node } from "@/generated/prisma/client";
 import { ExecutionRegistry } from "../types/executor-registry";
 import { NodeDataMap } from "../types/node-data-map";
+import { Events } from "@/inngest/event-type";
 
  const ExecuteWorkflow = inngest.createFunction({
     id:"execute-workflow"
 },{
-    event:"workflow/execute"
+    event:Events.WORKFLOW_EXECUTE
 },
 async ({
     event,
