@@ -1,5 +1,5 @@
 import DialogLayout from "@/components/common/dialog-layout"
-import type { DialogProps } from "@/types/execution/nodes/props";
+import type { DialogProps } from "@/services/executions/types/dialog-props";
 
 
 

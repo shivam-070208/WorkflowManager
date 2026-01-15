@@ -4,19 +4,35 @@ import { cn } from "@/lib/utils";
 import { useMotionTemplate, useMotionValue, motion } from "motion/react";
 import * as LabelPrimitive from "@radix-ui/react-label";
 
-// Remove empty interface: An interface declaring no members is equivalent to its supertype.
-// export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+// Fixes type error described in file_context_0 by splitting type and ref for textarea
 type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
+type TextAreaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
+const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <textarea
+        className={cn(
+          `shadow-input dark:placeholder-text-neutral-600 flex h-10 w-full max-h-60 rounded-md border-none bg-gray-50 px-3 py-2 text-sm text-black transition duration-400 group-hover/input:shadow-none file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-800 dark:text-white dark:shadow-[0px_0px_1px_1px_#404040] dark:focus-visible:ring-neutral-600`,
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
+);
+TextArea.displayName = "TextArea";
+
+// The composite Input component can only forward input refs, so for textarea usage, the ref must not be forwarded
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, ...props }, ref) => {
-    const radius = 100; // change this to increase the radius of the hover effect
+    const radius = 100;
     const [visible, setVisible] = React.useState(false);
 
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
 
-    // Fix 'any' type: Explicitly type the event as React.MouseEvent<HTMLDivElement, MouseEvent>
     function handleMouseMove(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
       const { currentTarget, clientX, clientY } = e;
       const { left, top } = currentTarget.getBoundingClientRect();
@@ -40,8 +56,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         onMouseLeave={() => setVisible(false)}
         className="group/input rounded-lg p-[2px] transition duration-300"
       >
+        {/* Fix type error: do NOT forward input ref to textarea */}
         {type === "textarea" ? (
-          <TextArea className={className} ref={ref} {...props} />
+          <TextArea className={className} {...(props as TextAreaProps)} />
         ) : (
           <input
             type={type}
@@ -60,28 +77,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
 Input.displayName = "Input";
 
-// Remove empty interface: An interface declaring no members is equivalent to its supertype.
-// export interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
-type TextAreaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
-
-const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  ({ className, ...props }, ref) => {
-    return (
-      <textarea
-        className={cn(
-          `shadow-input dark:placeholder-text-neutral-600 flex h-10 w-full max-h-60 rounded-md border-none bg-gray-50 px-3 py-2 text-sm text-black transition duration-400 group-hover/input:shadow-none file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-800 dark:text-white dark:shadow-[0px_0px_1px_1px_#404040] dark:focus-visible:ring-neutral-600`,
-          className
-        )}
-        ref={ref}
-        {...props}
-      />
-    );
-  }
-);
-
-TextArea.displayName = "TextArea";
-
-// No change needed here.
 const LabelInputContainer = ({
   children,
   className,
