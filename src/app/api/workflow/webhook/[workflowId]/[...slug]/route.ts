@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { inngest } from "@/inngest/client";
 import { Events } from "@/inngest/event-type";
 import { NodeType } from "@/generated/prisma/enums";
-const BASE_URL = process.env.NEXT_PUBLIC_WEBHOOK_BASE_URL;
+import { pathToUrlString } from "@/services/executions/nodes/triggernodes/webhook/lib/utils";
 
 const getSecretValue = (req: NextRequest, headerName: string) => {
   return req.headers.get(headerName || "x-webhook-secret");
@@ -11,7 +11,7 @@ const getSecretValue = (req: NextRequest, headerName: string) => {
 
 const handler = async (
   req: NextRequest,
-  ctx: RouteContext<"/api/workflow/webhook/[workflowId]/[...slug]">
+  ctx: RouteContext<"/api/workflow/webhook/[workflowId]/[...slug]">,
 ) => {
   try {
     const { workflowId, slug } = await ctx.params;
@@ -22,21 +22,21 @@ const handler = async (
         nodes: {
           some: {
             type: NodeType.WEBHOOK,
-          }
-        }
+          },
+        },
       },
       include: {
-        nodes: true
-      }
+        nodes: true,
+      },
     });
     if (!workflow) {
       return NextResponse.json(
         { message: "Workflow not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
-    const url = `${BASE_URL}/api/workflow/webhook/${workflowId}/${slug.join("/")}`;
+    const url = pathToUrlString(`${workflowId}/${slug.join("/")}`);
 
     const WebHookNode = workflow.nodes.find((node) => {
       if (node.type !== NodeType.WEBHOOK) return false;
@@ -45,12 +45,15 @@ const handler = async (
     });
 
     if (!WebHookNode) {
-      return NextResponse.json({
-        message: "No Valid Trigger Found",
-        description: "The Hook url is not valid please reverify your url"
-      }, {
-        status: 400
-      });
+      return NextResponse.json(
+        {
+          message: "No Valid Trigger Found",
+          description: "The Hook url is not valid please reverify your url",
+        },
+        {
+          status: 400,
+        },
+      );
     }
 
     let expectedSecret: string | undefined;
@@ -63,46 +66,58 @@ const handler = async (
       expectedSecret = (WebHookNode.data as { secret?: string }).secret;
     }
     if (expectedSecret) {
-      // Get the secret from the request header
       const receivedSecret = getSecretValue(req, secretHeaderName);
 
       if (!receivedSecret || receivedSecret !== expectedSecret) {
         return NextResponse.json(
           {
-            message: "Invalid or missing webhook secret"
+            message: "Invalid or missing webhook secret",
           },
-          { status: 401 }
+          { status: 401 },
         );
       }
     }
 
     let variableName: string | undefined;
-    if (typeof WebHookNode.data === "object" && WebHookNode.data !== null && "variable" in WebHookNode.data) {
+    if (
+      typeof WebHookNode.data === "object" &&
+      WebHookNode.data !== null &&
+      "variable" in WebHookNode.data
+    ) {
       variableName = (WebHookNode.data as { variable?: string }).variable;
     }
-
+    const context = variableName
+      ? {
+          [variableName]: {
+            method: req.method,
+            headers: Object.fromEntries(req.headers.entries()),
+            body:
+              req.method === "GET"
+                ? undefined
+                : await req.json().catch(() => undefined),
+            url: req.url,
+          },
+        }
+      : {};
     await inngest.send({
       name: Events.WORKFLOW_EXECUTE,
       data: {
         id: workflowId,
-        context: variableName
-          ? {
-              [variableName]: {
-                ...req,
-              },
-            }
-          : {},
+        context,
       },
     });
 
-    return NextResponse.json({ message: "Workflow execution requested" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Workflow execution requested" },
+      { status: 200 },
+    );
   } catch (error) {
     return NextResponse.json(
       {
         message: "server side error",
-        error: error instanceof Error ? error.message : error
+        error: error instanceof Error ? error.message : error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };

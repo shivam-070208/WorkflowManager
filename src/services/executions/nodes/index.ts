@@ -1,3 +1,4 @@
+"use client";
 /***********************
  * TRIGGER NODE IMPORT *
  ***********************/
@@ -10,18 +11,12 @@ import WebHookNode from "./triggernodes/webhook/components/node";
 
 import HttpRequestNode from "./workflownodes/httprequest/component/node";
 
-
 /***********************
  * TRIGGER NODE EXPORT *
  ***********************/
-export {
-    ManualTriggerNode,
-    WebHookNode
-}
+export { ManualTriggerNode, WebHookNode };
 
 /************************
  * WORKFLOW NODE EXPORT *
  ************************/
-export {
-    HttpRequestNode
-}
+export { HttpRequestNode };
