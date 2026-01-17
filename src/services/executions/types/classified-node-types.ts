@@ -6,4 +6,5 @@ export const TriggerNodeTypes: NodeType[] = [
 export const WorkflowNodeTypes: NodeType[] = [
   NodeType.GOOGLEFORM,
   NodeType.HTTPREQUEST,
+  NodeType.RESEND,
 ];

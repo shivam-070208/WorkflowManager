@@ -1,6 +1,12 @@
 import { NodeType } from "@/generated/prisma/enums";
 import type { LucideIcon } from "lucide-react";
-import { ClipboardList, MousePointerClick, Globe, Webhook } from "lucide-react";
+import {
+  ClipboardList,
+  MousePointerClick,
+  Globe,
+  Webhook,
+  RefreshCw as ResendIcon,
+} from "lucide-react";
 
 export type Node = {
   icon: LucideIcon;
@@ -33,5 +39,11 @@ export const NodesOptions: Node[] = [
     title: "HTTP Request",
     description: "Make an HTTP request to perform an action.",
     type: NodeType.HTTPREQUEST,
+  },
+  {
+    icon: ResendIcon,
+    title: "Resend",
+    description: "Send a gmail using resend as a services.",
+    type: NodeType.RESEND,
   },
 ];
