@@ -4,7 +4,7 @@ import { useNodeId, useReactFlow } from "@xyflow/react";
 import { RefreshCw as ResendIcon } from "lucide-react";
 import { memo, useMemo, useState } from "react";
 import HttpRequestDialog from "./dialog";
-
+const MASKEDLENGTH = 3;
 const ResendNode = memo(() => {
   const [open, setDialogOpen] = useState(false);
   const nodeId = useNodeId();
@@ -14,20 +14,26 @@ const ResendNode = memo(() => {
 
   const description = useMemo(() => {
     if (!node) return "unconfigured";
-    if (node && node.data && node.data.endpoint) {
-      return (
-        (node.data.method ? node.data.method + ": " : "") + node.data.endpoint
-      );
+    if (node && node.data && node.data.api_key) {
+      let maskedApiKey = node.data.api_key;
+      if (
+        typeof maskedApiKey === "string" &&
+        maskedApiKey.length > MASKEDLENGTH
+      ) {
+        maskedApiKey =
+          maskedApiKey.substring(0, MASKEDLENGTH) +
+          "*".repeat(maskedApiKey.length - MASKEDLENGTH);
+      }
+      return "api_key:" + maskedApiKey;
     }
     return "unconfigured";
   }, [node]);
 
   return (
     <>
-      {/* @ts-expect-error : TODO REMOVE IT MAKE RESEND DATA TYPE AND ASSIGN IT HERE */}
       <HttpRequestDialog
         open={open}
-        data={node?.data}
+        data={node?.data as ResendNodeDataTypes}
         onOpenChange={setDialogOpen}
       />
       <WorkflowNode

@@ -48,6 +48,7 @@ const ExecuteWorkflow = inngest.createFunction(
         }
       }
     });
+    console.log(sortedNodes[2])
     let context: Record<string, unknown> = event.data?.context ?? {};
     for (const node of sortedNodes) {
       if (TriggerNodeTypes.includes(node.type)) continue;
@@ -59,16 +60,16 @@ const ExecuteWorkflow = inngest.createFunction(
         );
       }
       context = await executor({
-        data: node.data as NodeDataMap[typeof node.type & keyof NodeDataMap],
-        context: context,
+        data: node.data as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+        context,
         step,
       });
-    }
 
-    return {
-      Message: "Completed",
-      context,
-    };
+      return {
+        Message: "Completed",
+        context,
+      };
+    }
   },
 );
 
