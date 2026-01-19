@@ -97,6 +97,7 @@ enum NodeType {
   WEBHOOK
   HTTPREQUEST
   AIAGENTS
+  RESEND
 }
 
 model Node {

@@ -10,6 +10,7 @@ import WebHookNode from "./triggernodes/webhook/components/node";
  ************************/
 
 import HttpRequestNode from "./workflownodes/httprequest/component/node";
+import ResendNode from "./workflownodes/resend/component/node";
 
 /***********************
  * TRIGGER NODE EXPORT *
@@ -19,4 +20,4 @@ export { ManualTriggerNode, WebHookNode };
 /************************
  * WORKFLOW NODE EXPORT *
  ************************/
-export { HttpRequestNode };
+export { HttpRequestNode, ResendNode };

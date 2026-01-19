@@ -4,6 +4,7 @@ import {
   HttpRequestNode,
   ManualTriggerNode,
   WebHookNode,
+  ResendNode,
 } from "@/services/executions/nodes";
 
 export const NodesTypes: Partial<Record<NodeType, React.FC>> = {
@@ -11,4 +12,5 @@ export const NodesTypes: Partial<Record<NodeType, React.FC>> = {
   [NodeType.MANUALTRIGGER]: ManualTriggerNode,
   [NodeType.WEBHOOK]: WebHookNode,
   [NodeType.HTTPREQUEST]: HttpRequestNode,
+  [NodeType.RESEND]: ResendNode,
 };

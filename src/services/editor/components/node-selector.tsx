@@ -17,7 +17,7 @@ import { useReactFlow, useNodes } from "@xyflow/react";
 import { generateSlug } from "random-word-slugs";
 import { toast } from "sonner";
 import type { Node as ReactFlowNode } from "@xyflow/react";
-import { Node, NodesOptions } from "@/config/nodes/node-selector-data";
+import { Node, NodesOptions } from "@/services/editor/utils/node-selector-data";
 import { filterBySearch, filterNodesByTypes } from "../utils/utils";
 import {
   TriggerNodeTypes,

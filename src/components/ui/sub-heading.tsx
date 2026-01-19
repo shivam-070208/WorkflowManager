@@ -20,13 +20,17 @@ const SubHeading = React.forwardRef<HTMLHeadingElement, SubHeadingProps>(
     return (
       <Comp
         ref={ref}
-        className={cn(subHeadingBaseStyles[as], className)}
+        className={cn(
+          subHeadingBaseStyles[as],
+          "text-muted-foreground",
+          className,
+        )}
         {...props}
       >
         {children}
       </Comp>
     );
-  }
+  },
 );
 
 SubHeading.displayName = "SubHeading";
