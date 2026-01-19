@@ -1,9 +1,7 @@
 import { inngest } from "@/inngest/client";
 import { NonRetriableError } from "inngest";
 import { sortWorkflow } from "../lib/utils";
-import { Node } from "@/generated/prisma/client";
 import { ExecutionRegistry } from "../types/executor-registry";
-import { NodeDataMap } from "../types/node-data-map";
 import { Events } from "@/inngest/event-type";
 import { TriggerNodeTypes } from "../types/classified-node-types";
 
@@ -48,12 +46,12 @@ const ExecuteWorkflow = inngest.createFunction(
         }
       }
     });
-    console.log(sortedNodes[2])
     let context: Record<string, unknown> = event.data?.context ?? {};
     for (const node of sortedNodes) {
       if (TriggerNodeTypes.includes(node.type)) continue;
       const executor =
         ExecutionRegistry[node.type as keyof typeof ExecutionRegistry];
+
       if (!executor) {
         throw new NonRetriableError(
           `No executor found for node type: ${node.type}`,
@@ -64,12 +62,12 @@ const ExecuteWorkflow = inngest.createFunction(
         context,
         step,
       });
-
-      return {
-        Message: "Completed",
-        context,
-      };
     }
+
+    return {
+      Message: "Completed",
+      context,
+    };
   },
 );
 
