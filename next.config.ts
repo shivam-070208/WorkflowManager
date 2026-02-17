@@ -4,15 +4,15 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: false,
-  async redirects(){
+  async redirects() {
     return [
       {
-        source:"/",
-        destination:"/login",
-        permanent:false
-      }
-    ]
-  }
+        source: "/",
+        destination: "/login",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default withSentryConfig(nextConfig, {

@@ -61,11 +61,9 @@ const EmailTemplate = ({
           {description && <Text style={styles.subheading}>{description}</Text>}
           {content && (
             <div style={styles.content}>
-import DOMPurify from "isomorphic-dompurify";
-
               <div
                 dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(content),
+                  __html: content,
                 }}
               />
             </div>

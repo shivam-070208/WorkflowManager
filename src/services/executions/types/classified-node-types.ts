@@ -7,4 +7,5 @@ export const WorkflowNodeTypes: NodeType[] = [
   NodeType.GOOGLEFORM,
   NodeType.HTTPREQUEST,
   NodeType.RESEND,
+  NodeType.AIAGENTS,
 ];
