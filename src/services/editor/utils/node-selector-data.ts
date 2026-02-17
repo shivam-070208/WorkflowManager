@@ -6,6 +6,7 @@ import {
   Globe,
   Webhook,
   RefreshCw as ResendIcon,
+  Brain,
 } from "lucide-react";
 
 export type Node = {
@@ -45,5 +46,12 @@ export const NodesOptions: Node[] = [
     title: "Resend",
     description: "Send a gmail using resend as a services.",
     type: NodeType.RESEND,
+  },
+  {
+    icon: Brain,
+    title: "AI Agent",
+    description:
+      "Use AI providers (ChatGPT, Google AI, Claude) for intelligent automation.",
+    type: NodeType.AIAGENTS,
   },
 ];
